@@ -1,5 +1,7 @@
 # everything-cli
 
+[![CI](https://github.com/LouisGameDev/everything-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/LouisGameDev/everything-cli/actions/workflows/ci.yml)
+
 A zero-dependency Python CLI for [Voidtools Everything](https://www.voidtools.com/) search.
 
 ```
