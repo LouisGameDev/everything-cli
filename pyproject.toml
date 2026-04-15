@@ -25,12 +25,14 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
+mcp = ["mcp[cli]>=1.0"]
 dev = ["pytest", "mypy"]
 
 [project.scripts]
 everything = "everything_cli.__main__:main"
 every = "everything_cli.__main__:main"
 ev = "everything_cli.__main__:main"
+everything-mcp = "everything_cli.mcp:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
