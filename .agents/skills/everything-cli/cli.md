@@ -97,12 +97,11 @@ ev ext:py -l | Select-Object -Skip 100 -First 25
 ## Fields & Sorting
 
 ```powershell
-ev ext:py -f name,size,date_modified    # select fields
+ev ext:py -f name,size,date_modified    # select fields (display + NDJSON)
 ev ext:py -f all                        # every field
 ev ext:py -f dates                      # group: date_created, date_modified, date_accessed
 ev ext:py -f meta                       # group: size, attributes, is_file, is_folder
-ev ext:py --columns name,size           # human-readable table columns
-ev --help-columns                       # list all available fields
+ev --help-fields                        # list all available fields
 ```
 
 Fields: `name` `path` `full_path` `ext` `size` `date_created` `date_modified` `date_accessed` `date_run` `date_recently_changed` `run_count` `attributes` `is_file` `is_folder` `hl_name` `hl_path` `hl_full_path`

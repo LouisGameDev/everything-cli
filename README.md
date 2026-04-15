@@ -14,8 +14,10 @@ cli.py       C:\Projects\toolkit\src             2026-04-14 22:05
 conftest.py  C:\Projects\webapp\tests            2026-04-14 21:30
 setup.py     C:\Projects\toolkit                 2026-04-14 20:12
 
-── 5 results (of 18,294 total) for "ext:py dm:thisweek" ──
-  Unique filenames: 5
+  5 of 18,294 results for "ext:py dm:thisweek"
+
+  └ unique   
+  └ unique    5
 ```
 
 ## What is Everything?
@@ -199,11 +201,13 @@ codegen.py          2.1 MB
 codegen.py          2.1 MB
 transformer.py      1.9 MB
 get-pip.py          1.3 MB
+  5 of 18,294 results for "ext:py"  │  sorted by size ↓
 
-── 5 results (of 18,294 total) for "ext:py"  [sorted by size ↓] ──
-  Total size: 11.2 MB
-  Duplicate filenames:
-    codegen.py  ×2
+  ├ size      11.2 MB
+  ├ unique    5
+  └ dupes     codegen.py1.2 MB
+  ├ unique    5
+  └ dupes     codegen.py ×2
 ```
 
 ### Combined functions — extension + size
@@ -216,10 +220,12 @@ generate_parser.py  3.8 MB  C:\Projects\compiler\src
 codegen.py          2.1 MB  C:\Python313\Lib\site-packages\torch\jit
 codegen.py          2.1 MB  D:\Envs\ml-project\.venv\Lib\site-packages\torch\jit
 transformer.py      1.9 MB  C:\Python313\Lib\site-packages\torch\nn\modules
-get-pip.py          1.3 MB  C:\Python313\Scripts
+  5 of 7 results for "ext:py size:>1mb"
 
-── 5 results (of 7 total) for "ext:py size:>1mb" ──
-  Total size: 11.2 MB
+  └ size     
+  5 of 7 results for "ext:py size:>1mb"
+
+  └ size      11.2 MB
 ```
 
 ### Date-scoped search with multiple columns
@@ -231,11 +237,13 @@ $ ev "ext:py dm:thisweek" -n 5 -f name,path,size,date_modified
 views.py     C:\Projects\webapp\src\api       8.2 KB  2026-04-15 14:32
 models.py    C:\Projects\webapp\src\db        6.4 KB  2026-04-14 23:18
 cli.py       C:\Projects\toolkit\src          4.1 KB  2026-04-14 22:05
-conftest.py  C:\Projects\webapp\tests         3.7 KB  2026-04-14 21:30
-setup.py     C:\Projects\toolkit              1.2 KB  2026-04-14 20:12
+  5 of 342 results for "ext:py dm:thisweek"
 
-── 5 results (of 342 total) for "ext:py dm:thisweek" ──
-  Total size: 23.6 KB
+  └ size     C:\Projects\toolkit              1.2 KB  2026-04-14 20:12
+
+  5 of 342 results for "ext:py dm:thisweek"
+
+  └ size      23.6 KB
 ```
 
 ### OR operator and size filter
@@ -246,12 +254,14 @@ Use `|` to combine extensions. Quote the pipe so the shell doesn't intercept it:
 $ ev "ext:log|ext:tmp size:>100kb" -n 5 -f name,size,path
 app-2026-04-14.log   1006.3 KB  C:\Projects\webapp\logs
 webpack.log          512.0 KB   C:\Projects\webapp\node_modules\.cache
-crash-report.log     8.0 MB     C:\ProgramData\MyApp\logs
-session-7a2f.tmp     314.1 KB   C:\Users\dev\AppData\Local\Temp
+  5 of 4,161 results for "ext:log|ext:tmp size:>100kb"
+
+  └ size     tmp     314.1 KB   C:\Users\dev\AppData\Local\Temp
 build-output.log     3.0 MB     D:\CI\artifacts\build-1842
 
-── 5 results (of 4,161 total) for "ext:log|ext:tmp size:>100kb" ──
-  Total size: 12.8 MB
+  5 of 4,161 results for "ext:log|ext:tmp size:>100kb"
+
+  └ size      12.8 MB
 ```
 
 ### Regex search
@@ -261,12 +271,16 @@ Find test files using Everything's `regex:` function:
 ```
 $ ev "regex:^test_.*\.py$" -n 5 -f name,path
 test_views.py         C:\Projects\webapp\tests\api
-test_models.py        C:\Projects\webapp\tests\db
+  5 of 1,847 results for "regex:^test_.*\.py$"
+
+  └ unique    5
 test_serializers.py   C:\Projects\webapp\tests\api
 test_auth.py          C:\Projects\webapp\tests\auth
 test_utils.py         C:\Projects\toolkit\tests
 
-── 5 results (of 1,847 total) for "regex:^test_.*\.py$" ──
+  5 of 1,847 results for "regex:^test_.*\.py$"
+
+  └ unique    5
 ```
 
 ### Duplicate detection
@@ -275,18 +289,16 @@ Everything's `dupe:` function finds files with identical names across drives:
 
 ```
 $ ev "dupe: ext:dll" -n 6 -f name,size,path
-vcruntime140.dll  99.0 KB   C:\Windows\System32
-vcruntime140.dll  99.0 KB   C:\Program Files\Common Files\Microsoft
-sqlite3.dll       1.8 MB    C:\Python313\DLLs
-sqlite3.dll       1.8 MB    D:\Envs\ml-project\.venv\DLLs
-libcrypto-3.dll   4.2 MB    C:\Program Files\Git\usr\bin
+  6 of 184,387 results for "dupe: ext:dll"
+
+  ├ unique    3 of 6
+  └ dupes     vcruntime140.dll ×2, sqlite3.dll ×2, libcrypto-3.dll2 MB    C:\Program Files\Git\usr\bin
 libcrypto-3.dll   4.2 MB    C:\Python313\DLLs
 
-── 6 results (of 184,387 total) for "dupe: ext:dll" ──
-  Duplicate filenames:
-    vcruntime140.dll  ×2
-    sqlite3.dll  ×2
-    libcrypto-3.dll  ×2
+  6 of 184,387 results for "dupe: ext:dll"
+
+  ├ unique    3 of 6
+  └ dupes     vcruntime140.dll ×2, sqlite3.dll ×2, libcrypto-3.dll ×2
 ```
 
 ### Finding large system files
@@ -295,14 +307,16 @@ Discover the biggest executables in System32:
 
 ```
 $ ev "ext:exe path:Windows\System32" -n 5 --sort size -d -f name,size,path
-MRT.exe             210.9 MB  C:\Windows\System32
-OneDriveSetup.exe   48.0 MB   C:\Windows\System32
+  5 of 1,676 results for "ext:exe path:Windows\System32"  │  sorted by size ↓
+
+  └ size     .exe   48.0 MB   C:\Windows\System32
 MpCmdRun.exe        18.3 MB   C:\Windows\System32
 msiexec.exe         12.4 MB   C:\Windows\System32
 svchost.exe         8.6 MB    C:\Windows\System32
 
-── 5 results (of 1,676 total) for "ext:exe path:Windows\System32"  [sorted by size ↓] ──
-  Total size: 298.2 MB
+  5 of 1,676 results for "ext:exe path:Windows\System32"  │  sorted by size ↓
+
+  └ size      298.2 MB
 ```
 
 ### Finding empty files
@@ -310,14 +324,18 @@ svchost.exe         8.6 MB    C:\Windows\System32
 `size:empty` locates zero-byte placeholder files:
 
 ```
-$ ev "size:empty ext:py" -n 5 -f name,size,path
+  5 of 4,206 results for "size:empty ext:py"
+
+  └ unique    5
 __init__.py  0 B  C:\Python313\Lib\site-packages\pip\_vendor\urllib3
 __init__.py  0 B  C:\Python313\Lib\site-packages\setuptools\_vendor
 __init__.py  0 B  C:\Projects\webapp\src\api
 __init__.py  0 B  C:\Projects\webapp\src\db
 __init__.py  0 B  C:\Projects\webapp\tests
 
-── 5 results (of 4,206 total) for "size:empty ext:py" ──
+  5 of 4,206 results for "size:empty ext:py"
+
+  └ unique    5
 ```
 
 ### Count mode
@@ -332,7 +350,9 @@ everything: 7 results for "ext:py size:>1mb"
 ### Pipe composition — chaining filters
 
 When you pipe `ev` into `ev`, the second invocation filters locally (no re-query).
-Search project files → exclude `__init__` → narrow to API:
+  4 of 14 results for "path:api"
+
+  └ unique    4narrow to API:
 
 ```
 $ ev "ext:py path:webapp\src" -n 20 -j | ev "!__init__" | ev "path:api" -f name,path
@@ -341,7 +361,9 @@ serializers.py  C:\Projects\webapp\src\api
 urls.py         C:\Projects\webapp\src\api
 permissions.py  C:\Projects\webapp\src\api
 
-── 4 results (of 14 total) for "path:api" ──
+  4 of 14 results for "path:api"
+
+  └ unique    4
 ```
 
 ### `ev filter` — structured NDJSON filtering
@@ -388,21 +410,21 @@ C:\Projects\webapp\src\db\models.py
 C:\Projects\toolkit\src\cli.py
 ```
 
-## Columns & Fields
+## Fields
 
-`--columns` controls the human-readable stderr display. `-f` / `--fields` controls NDJSON output fields.
+`-f` / `--fields` controls both the human-readable stderr display and NDJSON output fields.
 
 ```powershell
-ev ext:py -f name,size             # display: name + size
-ev ext:py -f all                   # all fields in NDJSON
+ev ext:py -f name,size             # display and NDJSON: name + size
+ev ext:py -f all                   # all fields
 ev ext:py -f dates,meta            # default + date + metadata groups
-ev ext:py --columns name,size      # custom stderr only, default NDJSON
 ```
 
-Run `ev --help-columns` for the full list:
+Run `ev --help-fields` for the full list:
 
 ```
-available columns:
+available fields (use with -f/--fields):
+
   * name                      file or folder name
   * path                      parent directory path
     full_path                 complete path including filename
@@ -423,9 +445,9 @@ available columns:
 
   * = included in default display
 
-groups (use with -f):
+groups:
     default      name, path
-    all          every available column
+    all          every available field
     dates        date_created, date_modified, date_accessed
     meta         size, ext, attributes, is_file, is_folder
     hl           hl_name, hl_path, hl_full_path

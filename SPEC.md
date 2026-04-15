@@ -378,14 +378,15 @@ src/
     pick.py              # pick subcommand (stdin NDJSON field extraction)
     sdk/
       __init__.py
-      dll.py             # ctypes DLL loader + auto-detect 32/64-bit
       constants.py       # All EVERYTHING_* constants
-      api.py             # Pythonic wrappers around DLL functions
-      types.py           # FILETIME conversion, result dataclasses
+      ipc.py             # Pure Python ctypes IPC (WM_COPYDATA, WM_USER)
+      api.py             # High-level API wrapper, instance resolution
+      types.py           # Field-to-flag mapping, field groups
     output/
       __init__.py
       ndjson.py          # NDJSON serializer (stdout)
       human.py           # Human-readable formatter (stderr)
+      color.py           # ANSI color support (auto/always/never)
     util/
       __init__.py
       glob.py            # Glob matching for filter command

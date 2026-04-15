@@ -82,7 +82,6 @@ def run_search(
     query: str,
     *,
     fields_spec: str | None = None,
-    columns: list[str] | None = None,
     sort_name: str | None = None,
     descending: bool = False,
     max_results: int | None = None,
@@ -107,11 +106,8 @@ def run_search(
         human.error(str(exc))
         return 1
 
-    # Determine display columns; ensure they're in the requested fields.
-    # If user explicitly set -f but not --columns, display only what they asked for.
-    if columns:
-        display_cols = columns
-    elif fields_spec:
+    # Determine display columns from -f spec (or defaults).
+    if fields_spec:
         display_cols = _parse_display_cols(fields_spec)
     else:
         display_cols = human.DEFAULT_COLUMNS
@@ -313,7 +309,7 @@ def _is_active(name: str, active_name: str | None) -> bool:
 def run_pipe_filter(
     query: str,
     *,
-    columns: list[str] | None = None,
+    fields_spec: str | None = None,
     max_results: int | None = None,
     offset: int = 0,
     quiet: bool = False,
@@ -331,7 +327,10 @@ def run_pipe_filter(
         human.error("empty query")
         return 1
 
-    display_cols = columns if columns else human.DEFAULT_COLUMNS
+    if fields_spec:
+        display_cols = _parse_display_cols(fields_spec)
+    else:
+        display_cols = human.DEFAULT_COLUMNS
     printer = human.ResultPrinter(display_cols)
 
     if list_sep is not None:

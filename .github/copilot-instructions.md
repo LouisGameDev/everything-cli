@@ -36,6 +36,7 @@ src/everything_cli/
   output/            Output formatters
     ndjson.py        NDJSON serializer (stdout)
     human.py         Human-readable formatter (stderr)
+    color.py         ANSI color support (auto/always/never)
   util/              Shared utilities
     glob.py          Glob matching
     dates.py         FILETIME ↔ ISO 8601

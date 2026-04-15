@@ -8,6 +8,7 @@ import sys
 import textwrap
 
 from .filter import FilterConfig, run_filter
+from .output.color import init as _init_color
 from .pick import run_pick
 from .search import run_count, run_info, run_instances, run_pipe_filter, run_search, run_version
 
@@ -53,15 +54,14 @@ _EPILOG = textwrap.dedent("""\
       Use -S/--search to force an Everything query with piped input.
       When stdout is piped, stderr is silenced automatically.
 
-    columns & fields:
-      --columns controls the human-readable stderr display.
-      -f/--fields controls which fields appear in NDJSON output.
-      Run ev --help-columns for the full list of available names and groups.
+    fields:
+      -f/--fields controls which fields appear in both the human-readable
+      stderr display and the NDJSON output.  Run ev --help-fields for the
+      full list of available names and groups.
 
-      Defaults:  --columns name,path,date_modified
-                 -f        name,path,full_path,date_modified
+      Default display: name, path, date_modified
 
-        ev ext:py --columns name,size        compact display
+        ev ext:py -f name,size               compact display
         ev ext:py -f all                     all fields in NDJSON
         ev ext:py -f dates,meta              default + date + metadata fields
 
@@ -90,8 +90,8 @@ _SORT_CHOICES = [
     "accessed", "run-count", "date-run", "recently-changed", "attributes",
 ]
 
-# Column/field descriptions for --help-columns
-_COLUMN_DESCRIPTIONS: dict[str, str] = {
+# Field descriptions for --help-fields
+_FIELD_DESCRIPTIONS: dict[str, str] = {
     "name":                   "file or folder name",
     "path":                   "parent directory path",
     "full_path":              "complete path including filename",
@@ -120,29 +120,28 @@ _GROUP_DESCRIPTIONS: dict[str, str] = {
 }
 
 
-def _print_columns_help() -> None:
-    """Print available columns/fields reference to stderr."""
+def _print_fields_help() -> None:
+    """Print available field names reference to stderr."""
     from .output.human import DEFAULT_COLUMNS
     lines = [
-        "available columns (use with --columns and -f/--fields):",
+        "available fields (use with -f/--fields):",
         "",
     ]
-    for col, desc in _COLUMN_DESCRIPTIONS.items():
-        marker = "  *" if col in DEFAULT_COLUMNS else "   "
-        lines.append(f"{marker} {col:<25s} {desc}")
+    for field, desc in _FIELD_DESCRIPTIONS.items():
+        marker = "  *" if field in DEFAULT_COLUMNS else "   "
+        lines.append(f"{marker} {field:<25s} {desc}")
     lines.append("")
-    lines.append("  * = included in default --columns display")
+    lines.append("  * = included in default display")
     lines.append("")
-    lines.append("groups (use with -f/--fields):")
+    lines.append("groups:")
     lines.append("")
     for group, desc in _GROUP_DESCRIPTIONS.items():
         lines.append(f"    {group:<12s} {desc}")
     lines.append("")
     lines.append("examples:")
-    lines.append(f"  ev ext:py --columns name,size,date_modified")
-    lines.append(f"  ev ext:py -f all                              # all fields in NDJSON")
-    lines.append(f"  ev ext:py -f dates,size                       # default + dates + size")
-    lines.append(f"  ev ext:py --columns name,path,size -f meta    # custom display + NDJSON fields")
+    lines.append(f"  ev ext:py -f name,size              # compact display")
+    lines.append(f"  ev ext:py -f all                    # all fields")
+    lines.append(f"  ev ext:py -f dates,size             # default + dates + size")
     print("\n".join(lines), file=sys.stderr)
 
 def _build_main_parser() -> argparse.ArgumentParser:
@@ -159,8 +158,8 @@ def _build_main_parser() -> argparse.ArgumentParser:
     parser.add_argument("--count", action="store_true", help="print only the result count as JSON")
     parser.add_argument("--instances", action="store_true",
                         help="list running Everything instances and exit")
-    parser.add_argument("--help-columns", action="store_true",
-                        help="list available column/field names and exit")
+    parser.add_argument("--help-fields", action="store_true",
+                        help="list available field names and exit")
 
     # Instance selection
     parser.add_argument("--instance", metavar="NAME", default=None,
@@ -181,15 +180,13 @@ def _build_main_parser() -> argparse.ArgumentParser:
     parser.add_argument("-s", "--sort", choices=_SORT_CHOICES, default=None, metavar="FIELD", help="sort field")
     parser.add_argument("-d", "--desc", action="store_true", help="descending sort order")
 
-    # Fields
+    # Fields (controls both NDJSON output and human-readable display)
     parser.add_argument("-f", "--fields", default=None, metavar="F1,F2,...",
-                        help="comma-separated NDJSON fields (or: default, all, dates, meta, hl)")
-
-    # Display columns (human-readable stderr output)
-    parser.add_argument("--columns", default=None, metavar="C1,C2,...",
-                        help="columns for human-readable stderr output (default: name,path,date_modified)")
+                        help="comma-separated fields for display and NDJSON (or: default, all, dates, meta, hl)")
 
     # Output
+    parser.add_argument("--color", choices=["auto", "always", "never"], default="auto",
+                        help="colorize stderr output (default: auto)")
     parser.add_argument("-q", "--quiet", action="store_true", help="suppress stderr output (NDJSON only)")
     parser.add_argument("-j", "--json", action="store_true",
                         help="force NDJSON to stdout even when interactive (auto when piped)")
@@ -280,6 +277,9 @@ def main(argv: list[str] | None = None) -> None:
     parser = _build_main_parser()
     ns = parser.parse_args(args)
 
+    # Initialise colour output
+    _init_color(ns.color)
+
     # Resolve instance from --instance flag (env var handled inside API)
     inst = ns.instance
 
@@ -287,8 +287,8 @@ def main(argv: list[str] | None = None) -> None:
     if ns.instances:
         emit_json = ns.json or not sys.stdout.isatty()
         sys.exit(run_instances(instance=inst, emit_json=emit_json))
-    if ns.help_columns:
-        _print_columns_help()
+    if ns.help_fields:
+        _print_fields_help()
         sys.exit(0)
     if ns.version:
         sys.exit(run_version(instance=inst))
@@ -317,11 +317,6 @@ def main(argv: list[str] | None = None) -> None:
         parser.print_help(sys.stderr)
         sys.exit(1)
 
-    # Parse --columns into a list
-    columns = None
-    if ns.columns:
-        columns = [c.strip() for c in ns.columns.split(",") if c.strip()]
-
     # Pipe composition: if stdin is piped NDJSON (and not --search), filter locally
     stdin_piped = not sys.stdin.isatty()
     stdout_piped = not sys.stdout.isatty()
@@ -340,7 +335,7 @@ def main(argv: list[str] | None = None) -> None:
         emit_json = (ns.json or stdout_piped) and list_sep is None
         sys.exit(run_pipe_filter(
             query,
-            columns=columns,
+            fields_spec=ns.fields,
             max_results=ns.max,
             offset=ns.offset,
             quiet=quiet,
@@ -354,7 +349,6 @@ def main(argv: list[str] | None = None) -> None:
     sys.exit(run_search(
         query,
         fields_spec=ns.fields,
-        columns=columns,
         sort_name=ns.sort,
         descending=ns.desc,
         max_results=ns.max,

@@ -4,22 +4,27 @@ import collections
 import sys
 from typing import Any
 
+from . import color
+
 _PROG = "everything"
 
 
 def info(msg: str) -> None:
     """Print info message to stderr. Format: 'everything: {msg}'"""
-    print(f"{_PROG}: {msg}", file=sys.stderr)
+    prefix = color.style(f"{_PROG}:", color.DIM)
+    print(f"{prefix} {msg}", file=sys.stderr)
 
 
 def error(msg: str) -> None:
     """Print error message to stderr. Format: 'everything: error: {msg}'"""
-    print(f"{_PROG}: error: {msg}", file=sys.stderr)
+    prefix = color.style(f"{_PROG}: error:", color.BOLD_RED)
+    print(f"{prefix} {msg}", file=sys.stderr)
 
 
 def warning(msg: str) -> None:
     """Print warning message to stderr. Format: 'everything: warning: {msg}'"""
-    print(f"{_PROG}: warning: {msg}", file=sys.stderr)
+    prefix = color.style(f"{_PROG}: warning:", color.BOLD_YELLOW)
+    print(f"{prefix} {msg}", file=sys.stderr)
 
 
 def summary(
@@ -30,12 +35,13 @@ def summary(
     descending: bool = False,
 ) -> None:
     """Print search summary line to stderr."""
-    num = f"{num_results:,}"
-    total = f"{total_results:,}"
-    line = f'{_PROG}: {num} results (of {total} total) for "{query}"'
+    num = color.style(f"{num_results:,}", color.BOLD)
+    total = color.style(f"{total_results:,}", color.DIM)
+    q = color.style(f'"{query}"', color.BOLD)
+    line = f"{color.style(_PROG + ':', color.DIM)} {num} results (of {total} total) for {q}"
     if sort_name is not None:
         arrow = "\u2193" if descending else "\u2191"
-        line += f"  [sorted by {sort_name} {arrow}]"
+        line += "  " + color.style(f"[sorted by {sort_name} {arrow}]", color.DIM)
     print(line, file=sys.stderr)
 
 
@@ -138,6 +144,31 @@ def _matches_active(name: str, active_name: str | None) -> bool:
     return False
 
 
+# ── Field colorisation ───────────────────────────────────────
+
+_DATE_FIELDS = frozenset((
+    "date_modified", "date_created", "date_accessed",
+    "date_run", "date_recently_changed",
+))
+
+
+def _color_value(field: str, text: str) -> str:
+    """Apply color to a formatted field value."""
+    if not text:
+        return text
+    if field == "name":
+        return color.style(text, color.BOLD_WHITE)
+    if field in ("path", "full_path"):
+        return color.style(text, color.DIM)
+    if field == "size":
+        return color.style(text, color.YELLOW)
+    if field in _DATE_FIELDS:
+        return color.style(text, color.CYAN)
+    if field == "ext":
+        return color.style(text, color.MAGENTA)
+    return text
+
+
 # ── Human-readable result table ──────────────────────────────────────
 
 DEFAULT_COLUMNS: list[str] = ["name", "path", "date_modified"]
@@ -206,7 +237,8 @@ class ResultPrinter:
         parts: list[str] = []
         for col in self.columns:
             val = record.get(col, "")
-            parts.append(_format_value(col, val))
+            formatted = _format_value(col, val)
+            parts.append(_color_value(col, formatted))
 
         line = "  ".join(parts)
 
@@ -245,43 +277,72 @@ class ResultPrinter:
         _stderr = sys.stderr
         try:
             print("", file=_stderr)  # blank separator
-            # ── Summary line ──
-            num = f"{num_results:,}"
-            total = f"{total_results:,}"
-            header = f'{num} results (of {total} total) for "{query}"'
+
+            # ── Header line ──
+            num = color.style(f"{num_results:,}", color.BOLD)
+            total = color.style(f"{total_results:,}", color.DIM)
+            q = color.style(f'"{query}"', color.BOLD)
+            header = f"  {num} of {total} results for {q}"
             if sort_name is not None:
                 arrow = "\u2193" if descending else "\u2191"
-                header += f"  [sorted by {sort_name} {arrow}]"
-            print(f"── {header} ──", file=_stderr)
+                sort_part = (
+                    color.style("\u2502", color.DIM)
+                    + "  sorted by "
+                    + color.style(sort_name, color.ITALIC)
+                    + " " + color.style(arrow, color.DIM)
+                )
+                header += f"  {sort_part}"
+            print(header, file=_stderr)
+            print("", file=_stderr)
 
-            # ── Statistics ──
+            # Collect stat lines to determine which get ├ vs └
+            stat_lines: list[str] = []
+
             if self._has_size:
-                print(f"  Total size: {_format_size(self._total_size)}", file=_stderr)
+                size_val = color.style(_format_size(self._total_size), color.BOLD + color.YELLOW)
+                stat_lines.append(f"size      {size_val}")
 
             unique_names = len(self._name_counts)
             if unique_names < self._count:
-                print(f"  Unique filenames: {unique_names:,} (of {self._count:,} results)",
-                      file=_stderr)
+                stat_lines.append(f"unique    {unique_names:,} of {self._count:,}")
             else:
-                print(f"  Unique filenames: {unique_names:,}", file=_stderr)
+                stat_lines.append(f"unique    {unique_names:,}")
 
             if self._ext_counts:
                 top_exts = self._ext_counts.most_common(8)
-                ext_str = ", ".join(f".{e} ({c})" for e, c in top_exts)
+                ext_parts: list[str] = []
+                for e, c in top_exts:
+                    ext_parts.append(
+                        color.style(f".{e}", color.MAGENTA)
+                        + color.style(f"({c})", color.DIM)
+                    )
+                ext_str = "  ".join(ext_parts)
                 if len(self._ext_counts) > 8:
-                    ext_str += f", … +{len(self._ext_counts) - 8} more"
-                print(f"  Extensions: {ext_str}", file=_stderr)
+                    ext_str += color.style(
+                        f"  \u2026 +{len(self._ext_counts) - 8} more", color.DIM
+                    )
+                stat_lines.append(f"ext       {ext_str}")
 
-            # ── Unique filenames (show duplicates — names appearing >1 time) ──
-            dupes = {name: count for name, count in self._name_counts.items() if count > 1}
+            # Duplicates
+            dupes = {name: cnt for name, cnt in self._name_counts.items() if cnt > 1}
             if dupes:
-                # Sort by count descending, show top 15
                 sorted_dupes = sorted(dupes.items(), key=lambda x: (-x[1], x[0]))
-                print(f"  Duplicate filenames:", file=_stderr)
-                for name, count in sorted_dupes[:15]:
-                    print(f"    {name}  ×{count}", file=_stderr)
-                if len(sorted_dupes) > 15:
-                    print(f"    … +{len(sorted_dupes) - 15} more", file=_stderr)
+                dupe_parts: list[str] = []
+                for name, cnt in sorted_dupes[:10]:
+                    dupe_parts.append(name + " " + color.style(f"\u00d7{cnt}", color.DIM))
+                dupe_str = ", ".join(dupe_parts)
+                if len(sorted_dupes) > 10:
+                    dupe_str += color.style(
+                        f", \u2026 +{len(sorted_dupes) - 10} more", color.DIM
+                    )
+                stat_lines.append(f"dupes     {dupe_str}")
+
+            # Print with box-drawing characters
+            for i, line in enumerate(stat_lines):
+                is_last = i == len(stat_lines) - 1
+                branch = "\u2514" if is_last else "\u251c"
+                branch_colored = color.style(branch, color.DIM)
+                print(f"  {branch_colored} {line}", file=_stderr)
 
         except BrokenPipeError:
             pass
