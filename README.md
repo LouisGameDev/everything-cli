@@ -65,6 +65,7 @@ The difference grows with drive size. On multi-drive systems with millions of fi
 - **Zero dependencies** — stdlib + ctypes only, no DLL needed
 - **Everything search syntax** — full pass-through (`ext:`, `dm:`, `size:`, `content:`, `dupe:`, regex, wildcards, macros)
 - **Importable Python API** — use as a library with typed `Cursor`/`Row` objects, DB-API 2.0 semantics
+- **MCP server** — expose Everything search to AI assistants (Copilot, Claude, etc.) via Model Context Protocol
 - **Multi-instance support** — works with Everything 1.4, 1.5, and 1.5a side by side
 - **Pure Python IPC** — communicates via ctypes `SendMessageW` / `WM_COPYDATA`, no DLL required
 
@@ -77,7 +78,8 @@ The difference grows with drive size. On multi-drive systems with millions of fi
 ## Installation
 
 ```powershell
-pip install everything-cli
+pip install everything-cli            # CLI + Python API
+pip install everything-cli[mcp]       # + MCP server for AI assistants
 ```
 
 Or install from source:
@@ -686,6 +688,7 @@ src/everything_cli/
   search.py          Search orchestration, pipe filter, count, info, version
   filter.py          Structured NDJSON filter (ev filter)
   pick.py            NDJSON field extraction (ev pick)
+  mcp.py             MCP server (search_files, count_files, get_everything_info)
   querymatch.py      Local query matching for pipe composition
   sdk/
     ipc.py           Pure Python IPC via ctypes (WM_COPYDATA, WM_USER)
@@ -703,6 +706,46 @@ src/everything_cli/
 
 **IPC approach**: Pure Python ctypes — `FindWindowW` to locate Everything's hidden IPC window, `SendMessageW` with `WM_COPYDATA` for search queries, `WM_USER` for version/info. No DLL dependency.
 
+## MCP Server
+
+`everything-cli` includes an [MCP](https://modelcontextprotocol.io/) server that exposes Everything search to AI assistants like GitHub Copilot, Claude, and any MCP-compatible client.
+
+### Setup
+
+```powershell
+pip install everything-cli[mcp]
+```
+
+Add to your MCP client config (VS Code `mcp.json`, Claude Desktop, etc.):
+
+```jsonc
+{
+  "mcpServers": {
+    "everything": {
+      "command": "everything-mcp"
+    }
+  }
+}
+```
+
+### Tools
+
+| Tool | Description |
+|------|-------------|
+| `search_files` | Search files/folders with full Everything syntax, field selection, sorting, pagination |
+| `count_files` | Count matches without transferring results — check scale before fetching |
+| `get_everything_info` | Service diagnostics: version, instance, admin status |
+
+### Example
+
+Once configured, your AI assistant can call these tools directly:
+
+```
+> Find the 5 largest Python files modified this week
+
+search_files(query="ext:py size:>50kb dm:thisweek", sort="size", descending=true, max_results=5)
+```
+
 ## Development
 
 ```powershell
@@ -715,6 +758,9 @@ mypy src/
 
 # Test (requires Everything running for integration tests)
 pytest
+
+# Install with MCP dependencies
+pip install -e ".[dev,mcp]"
 ```
 
 ## See Also

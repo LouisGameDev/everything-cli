@@ -114,7 +114,7 @@ class EverythingAPI:
 
         self._last_total_results = total
         self._last_num_results = num
-        yield from results
+        return results
 
     def get_num_results(self) -> int:
         """Get number of visible results (after last query)."""
