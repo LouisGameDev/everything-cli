@@ -6,6 +6,7 @@ Model Context Protocol (MCP).  Requires ``pip install everything-cli[mcp]``.
 Transport: stdio (default).  Launch with ``everything-mcp`` or
 ``python -m everything_cli.mcp``.
 """
+# pyright: reportMissingImports=false
 
 from __future__ import annotations
 
