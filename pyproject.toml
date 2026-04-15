@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools>=68.0", "setuptools-scm>=8.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "everything-cli"
+version = "2026.04.15"
+description = "Zero-dependency Python CLI for Voidtools Everything search. Binds directly to the Everything SDK DLL via ctypes."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [{ name = "Hong Lu" }]
+keywords = ["everything", "search", "voidtools", "cli", "ctypes"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Desktop Environment :: File Managers",
+    "Topic :: System :: Filesystems",
+    "Topic :: Utilities",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "mypy"]
+
+[project.scripts]
+everything = "everything_cli.__main__:main"
+every = "everything_cli.__main__:main"
+ev = "everything_cli.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+
+[tool.pyright]
+typeCheckingMode = "basic"
+
+[tool.pylint.format]
+max-line-length = 120
+
+[tool.pylint."messages_control"]
+disable = [
+    "invalid-name",              # Win32 constants use UPPER_CASE, not snake_case
+    "attribute-defined-outside-init",  # ctypes Structure fields are set via _fields_
+    "global-statement",          # required for Win32 callback → caller communication
+    "missing-class-docstring",   # ctypes Structure wrappers don't need docstrings
+    "import-outside-toplevel",   # deferred imports avoid circular deps
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

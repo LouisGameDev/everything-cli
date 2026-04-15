@@ -1,0 +1,117 @@
+"""Everything SDK constants for ctypes interop."""
+
+from __future__ import annotations
+
+from enum import IntEnum, IntFlag
+
+
+class RequestFlags(IntFlag):
+    """Flags for Everything_SetRequestFlags (OR'd together)."""
+
+    FILE_NAME = 0x00000001
+    PATH = 0x00000002
+    FULL_PATH_AND_FILE_NAME = 0x00000004
+    EXTENSION = 0x00000008
+    SIZE = 0x00000010
+    DATE_CREATED = 0x00000020
+    DATE_MODIFIED = 0x00000040
+    DATE_ACCESSED = 0x00000080
+    ATTRIBUTES = 0x00000100
+    FILE_LIST_FILE_NAME = 0x00000200
+    RUN_COUNT = 0x00000400
+    DATE_RUN = 0x00000800
+    DATE_RECENTLY_CHANGED = 0x00001000
+    HIGHLIGHTED_FILE_NAME = 0x00002000
+    HIGHLIGHTED_PATH = 0x00004000
+    HIGHLIGHTED_FULL_PATH_AND_FILE_NAME = 0x00008000
+
+
+class SortType(IntEnum):
+    """Sort types for Everything_SetSort."""
+
+    NAME_ASCENDING = 1
+    NAME_DESCENDING = 2
+    PATH_ASCENDING = 3
+    PATH_DESCENDING = 4
+    SIZE_ASCENDING = 5
+    SIZE_DESCENDING = 6
+    EXTENSION_ASCENDING = 7
+    EXTENSION_DESCENDING = 8
+    TYPE_NAME_ASCENDING = 9
+    TYPE_NAME_DESCENDING = 10
+    DATE_CREATED_ASCENDING = 11
+    DATE_CREATED_DESCENDING = 12
+    DATE_MODIFIED_ASCENDING = 13
+    DATE_MODIFIED_DESCENDING = 14
+    ATTRIBUTES_ASCENDING = 15
+    ATTRIBUTES_DESCENDING = 16
+    FILE_LIST_FILENAME_ASCENDING = 17
+    FILE_LIST_FILENAME_DESCENDING = 18
+    RUN_COUNT_ASCENDING = 19
+    RUN_COUNT_DESCENDING = 20
+    DATE_RECENTLY_CHANGED_ASCENDING = 21
+    DATE_RECENTLY_CHANGED_DESCENDING = 22
+    DATE_ACCESSED_ASCENDING = 23
+    DATE_ACCESSED_DESCENDING = 24
+    DATE_RUN_ASCENDING = 25
+    DATE_RUN_DESCENDING = 26
+
+
+class ErrorCode(IntEnum):
+    """Error codes from Everything_GetLastError."""
+
+    OK = 0
+    MEMORY = 1
+    IPC = 2
+    REGISTERCLASSEX = 3
+    CREATEWINDOW = 4
+    CREATETHREAD = 5
+    INVALIDINDEX = 6
+    INVALIDCALL = 7
+
+
+class TargetMachine(IntEnum):
+    """Target machine types."""
+
+    X86 = 1
+    X64 = 2
+    ARM = 3
+    ARM64 = 4
+
+
+class FileAttribute(IntFlag):
+    """Standard Windows FILE_ATTRIBUTE_* constants."""
+
+    READONLY = 0x01
+    HIDDEN = 0x02
+    SYSTEM = 0x04
+    DIRECTORY = 0x10
+    ARCHIVE = 0x20
+    DEVICE = 0x40
+    NORMAL = 0x80
+    TEMPORARY = 0x100
+    SPARSE_FILE = 0x200
+    REPARSE_POINT = 0x400
+    COMPRESSED = 0x800
+    OFFLINE = 0x1000
+    NOT_CONTENT_INDEXED = 0x2000
+    ENCRYPTED = 0x4000
+
+
+# CLI sort name -> (ascending, descending) mapping
+SORT_NAME_MAP: dict[str, tuple[SortType, SortType]] = {
+    "name": (SortType.NAME_ASCENDING, SortType.NAME_DESCENDING),
+    "path": (SortType.PATH_ASCENDING, SortType.PATH_DESCENDING),
+    "size": (SortType.SIZE_ASCENDING, SortType.SIZE_DESCENDING),
+    "ext": (SortType.EXTENSION_ASCENDING, SortType.EXTENSION_DESCENDING),
+    "created": (SortType.DATE_CREATED_ASCENDING, SortType.DATE_CREATED_DESCENDING),
+    "modified": (SortType.DATE_MODIFIED_ASCENDING, SortType.DATE_MODIFIED_DESCENDING),
+    "accessed": (SortType.DATE_ACCESSED_ASCENDING, SortType.DATE_ACCESSED_DESCENDING),
+    "run-count": (SortType.RUN_COUNT_ASCENDING, SortType.RUN_COUNT_DESCENDING),
+    "date-run": (SortType.DATE_RUN_ASCENDING, SortType.DATE_RUN_DESCENDING),
+    "recently-changed": (
+        SortType.DATE_RECENTLY_CHANGED_ASCENDING,
+        SortType.DATE_RECENTLY_CHANGED_DESCENDING,
+    ),
+    "attributes": (SortType.ATTRIBUTES_ASCENDING, SortType.ATTRIBUTES_DESCENDING),
+}
