@@ -49,6 +49,15 @@ disallow_untyped_defs = false
 disallow_any_explicit = false
 disable_error_code = ["attr-defined", "misc"]
 
+[[tool.mypy.overrides]]
+module = ["mcp.*", "pydantic"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "everything_cli.mcp"
+disallow_untyped_decorators = false
+warn_return_any = false
+
 [tool.pyright]
 typeCheckingMode = "basic"
 extraPaths = ["src"]
