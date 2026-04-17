@@ -1,4 +1,4 @@
-# everything-cli — CLI Reference
+# everything-mcp — CLI Reference
 
 Shell command for instant file search via Voidtools Everything.
 Aliases: `everything`, `every`, `ev`. Use `ev` for brevity.
@@ -6,7 +6,7 @@ Aliases: `everything`, `every`, `ev`. Use `ev` for brevity.
 ## Install
 
 ```powershell
-pip install everything-cli
+pip install everything-mcp
 ```
 
 ## Search Syntax (passed verbatim to Everything)
@@ -30,7 +30,6 @@ Dates:        dm:today  dm:thisweek  dc:yesterday  da:last2weeks
 | `-l` / `--list` | One full path per line | `ForEach-Object`, subshells |
 | `-0` / `--null` | Null-separated paths | Paths with spaces/special chars |
 | `-j` / `--json` | Force NDJSON | Structured processing |
-| `-q` / `--quiet` | Suppress stderr table | Silent scripts |
 
 ## Complex Examples
 

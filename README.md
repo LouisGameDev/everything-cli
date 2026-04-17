@@ -1,24 +1,27 @@
-# everything-cli
+# everything-mcp
 
-[![CI](https://github.com/LouisGameDev/everything-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/LouisGameDev/everything-cli/actions/workflows/ci.yml)
+[![CI](https://github.com/LouisGameDev/everything-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/LouisGameDev/everything-mcp/actions/workflows/ci.yml)
 
 A zero-dependency Python CLI for [Voidtools Everything](https://www.voidtools.com/) search.
 
+```powershell
+ev ext:py path:fixtures -n 5
 ```
-ev ext:py dm:thisweek -n 5
-```
-```
-views.py     C:\Projects\webapp\src\api          2026-04-15 14:32
-models.py    C:\Projects\webapp\src\db           2026-04-14 23:18
-cli.py       C:\Projects\toolkit\src             2026-04-14 22:05
-conftest.py  C:\Projects\webapp\tests            2026-04-14 21:30
-setup.py     C:\Projects\toolkit                 2026-04-14 20:12
 
-  5 of 18,294 results for "ext:py dm:thisweek"
-
-  └ unique   
-  └ unique    5
+<!-- example:hero -->
 ```
+views.py  2026-04-17 00:00  webapp\src\api  652 B
+models.py  2026-04-16 23:00  webapp\src\db  608 B
+serializers.py  2026-04-16 22:00  webapp\src\api  783 B
+middleware.py  2026-04-16 21:00  webapp\src  1011 B
+admin.py  2026-04-16 20:00  webapp\src  523 B
+
+  5 of 18 results for "ext:py path:fixtures"
+
+  ├ size      3.5 KB
+  └ names     admin.py  middleware.py  models.py  serializers.py  views.py
+```
+<!-- /example:hero -->
 
 ## What is Everything?
 
@@ -80,14 +83,14 @@ The difference grows with drive size. On multi-drive systems with millions of fi
 ## Installation
 
 ```powershell
-pip install everything-cli            # CLI + Python API
-pip install everything-cli[mcp]       # + MCP server for AI assistants
+pip install everything-mcp            # CLI + Python API
+pip install everything-mcp[mcp]       # + MCP server for AI assistants
 ```
 
 Or install from source:
 
 ```powershell
-pip install git+https://github.com/LouisGameDev/everything-cli.git
+pip install git+https://github.com/LouisGameDev/everything-mcp.git
 ```
 
 This registers three identical command aliases:
@@ -190,180 +193,167 @@ ev "ext:py size:>100kb" -j | jq -s '[.[].name]'
 
 ## Examples
 
-### Basic search with custom fields
+### Sort by size
 
-Find the 5 largest Python files, showing name and size:
+Find the 5 largest Python files:
 
+```powershell
+ev ext:py path:fixtures -n 5 --sort size -d -f name,size
 ```
-$ ev ext:py -n 5 --sort size -d -f name,size
-generate_parser.py  3.8 MB
-codegen.py          2.1 MB
-codegen.py          2.1 MB
-transformer.py      1.9 MB
-get-pip.py          1.3 MB
-  5 of 18,294 results for "ext:py"  │  sorted by size ↓
 
-  ├ size      11.2 MB
-  ├ unique    5
-  └ dupes     codegen.py1.2 MB
-  ├ unique    5
-  └ dupes     codegen.py ×2
+<!-- example:sort-size -->
 ```
+middleware.py  1011 B
+utils.py  824 B
+serializers.py  783 B
+test_views.py  718 B
+views.py  652 B
+
+  5 of 18 results for "ext:py path:fixtures"  │  sorted by size ↓
+
+  ├ size      3.9 KB
+  └ names     middleware.py  serializers.py  test_views.py  utils.py  views.py
+```
+<!-- /example:sort-size -->
 
 ### Combined functions — extension + size
 
-Search functions compose with AND. Find Python files over 1 MB:
+Search functions compose with AND. Find Python files over 500 bytes:
 
-```
-$ ev "ext:py size:>1mb" -n 5 -f name,size,path
-generate_parser.py  3.8 MB  C:\Projects\compiler\src
-codegen.py          2.1 MB  C:\Python313\Lib\site-packages\torch\jit
-codegen.py          2.1 MB  D:\Envs\ml-project\.venv\Lib\site-packages\torch\jit
-transformer.py      1.9 MB  C:\Python313\Lib\site-packages\torch\nn\modules
-  5 of 7 results for "ext:py size:>1mb"
-
-  └ size     
-  5 of 7 results for "ext:py size:>1mb"
-
-  └ size      11.2 MB
+```powershell
+ev "ext:py size:>500" path:fixtures -n 5 -f name,size,path
 ```
 
-### Date-scoped search with multiple columns
-
-Python files modified this week, with size and timestamps:
-
+<!-- example:size-filter -->
 ```
-$ ev "ext:py dm:thisweek" -n 5 -f name,path,size,date_modified
-views.py     C:\Projects\webapp\src\api       8.2 KB  2026-04-15 14:32
-models.py    C:\Projects\webapp\src\db        6.4 KB  2026-04-14 23:18
-cli.py       C:\Projects\toolkit\src          4.1 KB  2026-04-14 22:05
-  5 of 342 results for "ext:py dm:thisweek"
+views.py  652 B  webapp\src\api
+models.py  608 B  webapp\src\db
+serializers.py  783 B  webapp\src\api
+middleware.py  1011 B  webapp\src
+admin.py  523 B  webapp\src
 
-  └ size     C:\Projects\toolkit              1.2 KB  2026-04-14 20:12
+  5 of 10 results for "ext:py size:>500 path:fixtures"
 
-  5 of 342 results for "ext:py dm:thisweek"
+  ├ size      3.5 KB
+  └ names     admin.py  middleware.py  models.py  serializers.py  views.py
+```
+<!-- /example:size-filter -->
 
-  └ size      23.6 KB
+### Custom field order
+
+Show name, path, size, and date in any order you want:
+
+```powershell
+ev "ext:py path:fixtures" -n 5 -f name,path,size,date_modified
 ```
 
-### OR operator and size filter
+<!-- example:date-scope -->
+```
+views.py  webapp\src\api  652 B  2026-04-17 00:00
+models.py  webapp\src\db  608 B  2026-04-16 23:00
+serializers.py  webapp\src\api  783 B  2026-04-16 22:00
+middleware.py  webapp\src  1011 B  2026-04-16 21:00
+admin.py  webapp\src  523 B  2026-04-16 20:00
+
+  5 of 18 results for "ext:py path:fixtures"
+
+  ├ size      3.5 KB
+  └ names     admin.py  middleware.py  models.py  serializers.py  views.py
+```
+<!-- /example:date-scope -->
+
+### OR operator
 
 Use `|` to combine extensions. Quote the pipe so the shell doesn't intercept it:
 
+```powershell
+ev 'ext:log|ext:tmp path:fixtures' -n 5 -f name,size,path
 ```
-$ ev "ext:log|ext:tmp size:>100kb" -n 5 -f name,size,path
-app-2026-04-14.log   1006.3 KB  C:\Projects\webapp\logs
-webpack.log          512.0 KB   C:\Projects\webapp\node_modules\.cache
-  5 of 4,161 results for "ext:log|ext:tmp size:>100kb"
 
-  └ size     tmp     314.1 KB   C:\Users\dev\AppData\Local\Temp
-build-output.log     3.0 MB     D:\CI\artifacts\build-1842
-
-  5 of 4,161 results for "ext:log|ext:tmp size:>100kb"
-
-  └ size      12.8 MB
+<!-- example:or-operator -->
 ```
+cache.tmp  195.3 KB  webapp
+app-2026-04-14.log  258.8 KB  webapp\logs
+debug.log  12.6 KB  webapp\logs
+
+  3 of 3 results for "ext:log|ext:tmp path:fixtures"
+
+  ├ size      466.7 KB
+  └ names     app-2026-04-14.log  cache.tmp  debug.log
+```
+<!-- /example:or-operator -->
 
 ### Regex search
 
 Find test files using Everything's `regex:` function:
 
-```
-$ ev "regex:^test_.*\.py$" -n 5 -f name,path
-test_views.py         C:\Projects\webapp\tests\api
-  5 of 1,847 results for "regex:^test_.*\.py$"
-
-  └ unique    5
-test_serializers.py   C:\Projects\webapp\tests\api
-test_auth.py          C:\Projects\webapp\tests\auth
-test_utils.py         C:\Projects\toolkit\tests
-
-  5 of 1,847 results for "regex:^test_.*\.py$"
-
-  └ unique    5
+```powershell
+ev 'regex:^test_.*\.py$ path:fixtures' -n 5 -f name,path
 ```
 
-### Duplicate detection
-
-Everything's `dupe:` function finds files with identical names across drives:
-
+<!-- example:regex -->
 ```
-$ ev "dupe: ext:dll" -n 6 -f name,size,path
-  6 of 184,387 results for "dupe: ext:dll"
+test_views.py  webapp\tests
+test_serializers.py  webapp\tests
+test_auth.py  webapp\tests
+test_utils.py  toolkit\tests
 
-  ├ unique    3 of 6
-  └ dupes     vcruntime140.dll ×2, sqlite3.dll ×2, libcrypto-3.dll2 MB    C:\Program Files\Git\usr\bin
-libcrypto-3.dll   4.2 MB    C:\Python313\DLLs
+  4 of 4 results for "regex:^test_.*\.py$ path:fixtures"
 
-  6 of 184,387 results for "dupe: ext:dll"
-
-  ├ unique    3 of 6
-  └ dupes     vcruntime140.dll ×2, sqlite3.dll ×2, libcrypto-3.dll ×2
+  └ names     test_auth.py  test_serializers.py  test_utils.py  test_views.py
 ```
-
-### Finding large system files
-
-Discover the biggest executables in System32:
-
-```
-$ ev "ext:exe path:Windows\System32" -n 5 --sort size -d -f name,size,path
-  5 of 1,676 results for "ext:exe path:Windows\System32"  │  sorted by size ↓
-
-  └ size     .exe   48.0 MB   C:\Windows\System32
-MpCmdRun.exe        18.3 MB   C:\Windows\System32
-msiexec.exe         12.4 MB   C:\Windows\System32
-svchost.exe         8.6 MB    C:\Windows\System32
-
-  5 of 1,676 results for "ext:exe path:Windows\System32"  │  sorted by size ↓
-
-  └ size      298.2 MB
-```
+<!-- /example:regex -->
 
 ### Finding empty files
 
 `size:empty` locates zero-byte placeholder files:
 
+```powershell
+ev 'size:empty ext:py path:fixtures' -f name,size,path
 ```
-  5 of 4,206 results for "size:empty ext:py"
 
-  └ unique    5
-__init__.py  0 B  C:\Python313\Lib\site-packages\pip\_vendor\urllib3
-__init__.py  0 B  C:\Python313\Lib\site-packages\setuptools\_vendor
-__init__.py  0 B  C:\Projects\webapp\src\api
-__init__.py  0 B  C:\Projects\webapp\src\db
-__init__.py  0 B  C:\Projects\webapp\tests
-
-  5 of 4,206 results for "size:empty ext:py"
-
-  └ unique    5
+<!-- example:empty-files -->
 ```
+__init__.py  0 B  webapp\tests
+__init__.py  0 B  webapp\src\db
+__init__.py  0 B  webapp\src\api
+__init__.py  0 B  webapp\src
+
+  4 of 4 results for "size:empty ext:py path:fixtures"
+
+  ├ size      0 B
+  └ names     __init__.py×4
+```
+<!-- /example:empty-files -->
 
 ### Count mode
 
 Just the number — no results, no table:
 
+```powershell
+ev --count 'ext:py path:fixtures'
 ```
-$ ev --count "ext:py size:>1mb"
-everything: 7 results for "ext:py size:>1mb"
+
+<!-- example:count -->
 ```
+everything: 18 results for "ext:py path:fixtures"
+```
+<!-- /example:count -->
 
 ### Pipe composition — chaining filters
 
 When you pipe `ev` into `ev`, the second invocation filters locally (no re-query).
-  4 of 14 results for "path:api"
+Start broad, then narrow to API:
 
-  └ unique    4narrow to API:
+```powershell
+ev 'ext:py path:webapp\src' -n 20 -j | ev '!__init__' | ev 'path:api' -f name,path
+```
 
 ```
-$ ev "ext:py path:webapp\src" -n 20 -j | ev "!__init__" | ev "path:api" -f name,path
 views.py        C:\Projects\webapp\src\api
 serializers.py  C:\Projects\webapp\src\api
 urls.py         C:\Projects\webapp\src\api
 permissions.py  C:\Projects\webapp\src\api
-
-  4 of 14 results for "path:api"
-
-  └ unique    4
 ```
 
 ### `ev filter` — structured NDJSON filtering
@@ -371,8 +361,11 @@ permissions.py  C:\Projects\webapp\src\api
 `ev filter` applies typed conditions to NDJSON fields — like `jq` but zero-dep.
 Find project source files > 5 KB:
 
+```powershell
+ev 'ext:py path:webapp\src' -f all -j | ev filter --size-gt 5000 --is-file | ev pick name size
 ```
-$ ev "ext:py path:webapp\src" -f all -j | ev filter --size-gt 5000 --is-file | ev pick name size
+
+```
 {"name":"views.py","size":8412}
 {"name":"models.py","size":6553}
 {"name":"serializers.py","size":7201}
@@ -384,8 +377,11 @@ $ ev "ext:py path:webapp\src" -f all -j | ev filter --size-gt 5000 --is-file | e
 
 Extract only the fields you need from NDJSON:
 
+```powershell
+ev 'ext:py path:webapp\src' -n 5 -f all -j | ev pick name size
 ```
-$ ev "ext:py path:webapp\src" -n 5 -f all -j | ev pick name size
+
+```
 {"name":"views.py","size":8412}
 {"name":"models.py","size":6553}
 {"name":"urls.py","size":345}
@@ -401,14 +397,18 @@ $ ev "ext:py path:webapp\src" -n 5 -f all -j | ev pick name size
 | `-l` / `--list` | One full path per line | `ForEach-Object`, `$(...)` |
 | `-0` / `--null` | Null-separated full paths | Paths with special characters |
 | `-j` / `--json` | Force NDJSON to stdout | Processing with `ev filter`/`ev pick`/`jq` |
-| `-q` / `--quiet` | Suppress stderr | Silent scripting |
 
+```powershell
+ev ext:py path:fixtures -n 3 -l
 ```
-$ ev ext:py -n 3 -l
-C:\Projects\webapp\src\api\views.py
-C:\Projects\webapp\src\db\models.py
-C:\Projects\toolkit\src\cli.py
+
+<!-- example:list-mode -->
 ```
+webapp\src\api\views.py
+webapp\src\db\models.py
+webapp\src\api\serializers.py
+```
+<!-- /example:list-mode -->
 
 ## Fields
 
@@ -429,7 +429,7 @@ available fields (use with -f/--fields):
   * path                      parent directory path
     full_path                 complete path including filename
     ext                       file extension (without dot)
-    size                      file size in bytes
+  * size                      file size in bytes
     date_created              creation timestamp
   * date_modified             last modified timestamp
     date_accessed             last accessed timestamp
@@ -447,7 +447,7 @@ available fields (use with -f/--fields):
 
 groups:
     default      name, path
-    all          every available field
+    all          every available column
     dates        date_created, date_modified, date_accessed
     meta         size, ext, attributes, is_file, is_folder
     hl           hl_name, hl_path, hl_full_path
@@ -526,7 +526,7 @@ Priority: `--instance` flag > `$EVERYTHING_INSTANCE` env var > auto-detect.
 
 ```
 $ ev --version
-everything-cli 2026.04.15 (Python 3.13.5) / Everything 1.5.0.1404
+everything-mcp 2026.04.15 (Python 3.13.5) / Everything 1.5.0.1404
 Instance: 1.5a  (via auto-detect)
 
 $ ev --info
@@ -546,16 +546,16 @@ Active instance: 1.5a
 
 ## Python API
 
-`everything-cli` is also a fully importable Python library — no CLI needed. The API uses DB-API 2.0 cursor/row semantics, is fully type-annotated, and has zero dependencies.
+`everything-mcp` is also a fully importable Python library — no CLI needed. The API uses DB-API 2.0 cursor/row semantics, is fully type-annotated, and has zero dependencies.
 
 ```powershell
-pip install everything-cli
+pip install everything-mcp
 ```
 
 ### Quick Start
 
 ```python
-from everything_cli import search, count
+from everything_mcp import search, count
 
 # Iterate results
 for row in search("ext:py"):
@@ -568,7 +568,7 @@ print(f"Python files: {count('ext:py')}")
 ### Search with Options
 
 ```python
-from everything_cli import search
+from everything_mcp import search
 
 # Find the 10 largest log files
 cursor = search(
@@ -591,7 +591,7 @@ Parameters: `query`, `fields`, `sort`, `descending`, `limit`, `offset`, `match_c
 `search()` returns a `Cursor` — a forward-only iterator with DB-API 2.0 fetch methods.
 
 ```python
-from everything_cli import search
+from everything_mcp import search
 
 cursor = search("ext:py", limit=100)
 
@@ -624,7 +624,7 @@ while batch := cursor.fetchmany(500):
 Each result is a `Row` with typed properties and dict-style access.
 
 ```python
-from everything_cli import search
+from everything_mcp import search
 
 for row in search("ext:py dm:today", fields="size,dates"):
     # Typed properties (IDE autocomplete works)
@@ -650,7 +650,7 @@ for row in search("ext:py dm:today", fields="size,dates"):
 For repeated queries or service introspection, create an `Everything` instance.
 
 ```python
-from everything_cli import Everything
+from everything_mcp import Everything
 
 ev = Everything()               # auto-detect running instance
 # ev = Everything("1.5a")      # target a specific instance
@@ -673,7 +673,7 @@ for inst in Everything.instances():
 ### Error Handling
 
 ```python
-from everything_cli import search, EverythingError
+from everything_mcp import search, EverythingError
 
 try:
     results = search("ext:py").fetchall()
@@ -687,7 +687,7 @@ except EverythingError as e:
 ### Fields and Sorting
 
 ```python
-from everything_cli import search
+from everything_mcp import search
 
 # Field groups: "default", "all", "dates", "meta", "hl"
 search("*.py", fields="all")            # every available field
@@ -705,7 +705,7 @@ For the full API reference, see [docs/PYTHON_API_SPEC.md](docs/PYTHON_API_SPEC.m
 ## Architecture
 
 ```
-src/everything_cli/
+src/everything_mcp/
   __main__.py        CLI entry point, argparse, dispatch
   search.py          Search orchestration, pipe filter, count, info, version
   filter.py          Structured NDJSON filter (ev filter)
@@ -730,12 +730,12 @@ src/everything_cli/
 
 ## MCP Server
 
-`everything-cli` includes an [MCP](https://modelcontextprotocol.io/) server that exposes Everything search to AI assistants like GitHub Copilot, Claude, and any MCP-compatible client.
+`everything-mcp` includes an [MCP](https://modelcontextprotocol.io/) server that exposes Everything search to AI assistants like GitHub Copilot, Claude, and any MCP-compatible client.
 
 ### Setup
 
 ```powershell
-pip install everything-cli[mcp]
+pip install everything-mcp[mcp]
 ```
 
 Add to your MCP client config (VS Code `mcp.json`, Claude Desktop, etc.):

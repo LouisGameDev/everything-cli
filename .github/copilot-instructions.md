@@ -1,8 +1,8 @@
-# Copilot Instructions for everything-cli
+# Copilot Instructions for everything-mcp
 
 ## Project Overview
 
-`everything-cli` is a zero-dependency Python CLI for querying Voidtools Everything file search on Windows. It communicates via pure Python IPC (ctypes `WM_COPYDATA`) with no DLL required.
+`everything-mcp` is a zero-dependency Python CLI for querying Voidtools Everything file search on Windows. It communicates via pure Python IPC (ctypes `WM_COPYDATA`) with no DLL required.
 
 ## Technical Stack
 
@@ -22,7 +22,7 @@
 ## Project Structure
 
 ```
-src/everything_cli/
+src/everything_mcp/
   __main__.py        CLI entry, argparse, dispatch
   search.py          Search orchestration, pipe filter, count, info
   filter.py          Structured NDJSON filter subcommand

@@ -1,4 +1,4 @@
-# everything-cli — Design Spec
+# everything-mcp — Design Spec
 
 > Zero-dependency Python CLI for Voidtools Everything search.
 > Binds directly to the Everything SDK DLL via ctypes.
@@ -28,7 +28,7 @@ every       (alias)
 ev          (alias)
 ```
 
-Both point to the same `everything_cli.__main__:main` entry point.
+Both point to the same `everything_mcp.__main__:main` entry point.
 
 ### Grammar
 
@@ -255,7 +255,7 @@ every ext:py -f all | every pick full_path size
 every --version
 ```
 
-stderr: `everything-cli 0.1.0 (Python 3.13.5) / Everything 1.4.1.1024`
+stderr: `everything-mcp 0.1.0 (Python 3.13.5) / Everything 1.4.1.1024`
 
 #### `--info`
 
@@ -370,7 +370,7 @@ every ext:py -f default,size | ConvertFrom-Json | Where-Object { $_.size -gt 100
 
 ```
 src/
-  everything_cli/
+  everything_mcp/
     __init__.py
     __main__.py          # entry point, argparse, dispatches to search/filter/pick
     search.py            # core search logic (default action, --count, --info, --version)

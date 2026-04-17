@@ -1,7 +1,7 @@
 ---
-name: everything-cli
+name: everything-mcp
 description: >
-  Use the everything-cli (ev) command, Python API, or MCP tools to search files
+  Use the everything-mcp (ev) command, Python API, or MCP tools to search files
   instantly on Windows via Voidtools Everything. Use when the user asks to "find
   files", "search for files", "locate a file", "list files by extension", "find
   large files", "find recent files", "find duplicates", or any file discovery
@@ -14,7 +14,7 @@ compatibility: >
   running in the background.
 ---
 
-# everything-cli
+# everything-mcp
 
 Instant file search on Windows via [Voidtools Everything](https://www.voidtools.com/).
 Three interfaces — choose based on context:
@@ -30,7 +30,7 @@ For Everything search syntax details beyond this cheat sheet, see the scraped SD
 ## Decision Guide
 
 - **User asks to find/list files in terminal** → CLI (`ev`)
-- **User writes a Python script that needs file search** → API (`from everything_cli import search`)
+- **User writes a Python script that needs file search** → API (`from everything_mcp import search`)
 - **You (the agent) need to find files on Windows** → MCP tools (`search_files`, `count_files`)
 - **User asks "how many X files?"** → MCP `count_files` or CLI `ev --count`
 - **User asks for file contents after search** → CLI `ev -l | ForEach-Object { ... }` or API iteration
@@ -39,8 +39,8 @@ For Everything search syntax details beyond this cheat sheet, see the scraped SD
 ## Install
 
 ```powershell
-pip install everything-cli          # CLI + API
-pip install everything-cli[mcp]     # + MCP server
+pip install everything-mcp          # CLI + API
+pip install everything-mcp[mcp]     # + MCP server
 ```
 
 ## Search Syntax (shared across all interfaces)

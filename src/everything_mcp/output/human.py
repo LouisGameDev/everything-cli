@@ -54,7 +54,7 @@ def version_info(
 ) -> None:
     """Print version to stderr."""
     ev_part = f"Everything {ev_version}" if ev_version else "Everything: not available"
-    line = f"everything-cli {cli_version} (Python {python_version}) / {ev_part}"
+    line = f"everything-mcp {cli_version} (Python {python_version}) / {ev_part}"
     if instance_name:
         line += f"\nInstance: {instance_name}"
         if instance_source:
@@ -171,7 +171,7 @@ def _color_value(field: str, text: str) -> str:
 
 # ── Human-readable result table ──────────────────────────────────────
 
-DEFAULT_COLUMNS: list[str] = ["name", "path", "date_modified"]
+DEFAULT_COLUMNS: list[str] = ["name", "date_modified", "path", "size"]
 
 
 def _format_size(val: Any) -> str:
@@ -302,12 +302,6 @@ class ResultPrinter:
                 size_val = color.style(_format_size(self._total_size), color.BOLD + color.YELLOW)
                 stat_lines.append(f"size      {size_val}")
 
-            unique_names = len(self._name_counts)
-            if unique_names < self._count:
-                stat_lines.append(f"unique    {unique_names:,} of {self._count:,}")
-            else:
-                stat_lines.append(f"unique    {unique_names:,}")
-
             if self._ext_counts:
                 top_exts = self._ext_counts.most_common(8)
                 ext_parts: list[str] = []
@@ -323,19 +317,22 @@ class ResultPrinter:
                     )
                 stat_lines.append(f"ext       {ext_str}")
 
-            # Duplicates
-            dupes = {name: cnt for name, cnt in self._name_counts.items() if cnt > 1}
-            if dupes:
-                sorted_dupes = sorted(dupes.items(), key=lambda x: (-x[1], x[0]))
-                dupe_parts: list[str] = []
-                for name, cnt in sorted_dupes[:10]:
-                    dupe_parts.append(name + " " + color.style(f"\u00d7{cnt}", color.DIM))
-                dupe_str = ", ".join(dupe_parts)
-                if len(sorted_dupes) > 10:
-                    dupe_str += color.style(
-                        f", \u2026 +{len(sorted_dupes) - 10} more", color.DIM
+            # Unique filenames
+            names = sorted(self._name_counts.keys(), key=str.lower)
+            if names:
+                display_names: list[str] = []
+                for n in names[:15]:
+                    cnt = self._name_counts[n]
+                    part = color.style(n, color.BOLD_WHITE)
+                    if cnt > 1:
+                        part += color.style(f"\u00d7{cnt}", color.DIM)
+                    display_names.append(part)
+                names_str = "  ".join(display_names)
+                if len(names) > 15:
+                    names_str += color.style(
+                        f"  \u2026 +{len(names) - 15} more", color.DIM
                     )
-                stat_lines.append(f"dupes     {dupe_str}")
+                stat_lines.append(f"names     {names_str}")
 
             # Print with box-drawing characters
             for i, line in enumerate(stat_lines):

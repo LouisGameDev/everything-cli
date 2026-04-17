@@ -1,6 +1,6 @@
 # Python API Specification
 
-> Public importable API for using `everything-cli` as a library — no CLI needed.
+> Public importable API for using `everything-mcp` as a library — no CLI needed.
 
 ## Design Goals
 
@@ -15,13 +15,13 @@
 
 ```python
 # Primary API (95% of usage)
-from everything_cli import search, count, Everything
+from everything_mcp import search, count, Everything
 
 # Types for annotation / error handling
-from everything_cli import Cursor, Row, EverythingError
+from everything_mcp import Cursor, Row, EverythingError
 ```
 
-The public API lives in `everything_cli/__init__.py`.  
+The public API lives in `everything_mcp/__init__.py`.  
 Internal modules (`sdk.*`, `output.*`, `util.*`) are **not** part of the public API.
 
 ---
@@ -92,7 +92,7 @@ Execute an Everything search and return a `Cursor`.
 
 **Example:**
 ```python
-from everything_cli import search
+from everything_mcp import search
 
 for row in search("ext:py dm:today"):
     print(row.full_path, row.size)
@@ -118,7 +118,7 @@ Return the total number of Everything matches for a query, without fetching resu
 
 **Example:**
 ```python
-from everything_cli import count
+from everything_mcp import count
 
 print(f"Python files: {count('ext:py')}")
 ```
@@ -372,7 +372,7 @@ Raised when:
 
 **Example:**
 ```python
-from everything_cli import search, EverythingError
+from everything_mcp import search, EverythingError
 
 try:
     cursor = search("*.py")
@@ -409,7 +409,7 @@ os.environ["EVERYTHING_INSTANCE"] = "1.5a"
 search("*.py")  # uses 1.5a
 
 # List all running
-from everything_cli import Everything
+from everything_mcp import Everything
 for inst in Everything.instances():
     print(inst["name"])
 ```
@@ -448,7 +448,7 @@ search() / count()              ← module-level convenience
 ## 9. Platform Behaviour
 
 - **Windows:** Full functionality (IPC with Everything service)
-- **Other OS:** `import everything_cli` succeeds, but `search()`/`count()` raise `EverythingError` with a clear message. This allows cross-platform code that conditionally uses Everything.
+- **Other OS:** `import everything_mcp` succeeds, but `search()`/`count()` raise `EverythingError` with a clear message. This allows cross-platform code that conditionally uses Everything.
 
 ---
 

@@ -3,7 +3,7 @@ requires = ["setuptools>=68.0", "setuptools-scm>=8.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "everything-cli"
+name = "everything-mcp"
 version = "2026.04.15"
 description = "Zero-dependency Python CLI for Voidtools Everything search. Binds directly to the Everything SDK DLL via ctypes."
 readme = "README.md"
@@ -29,10 +29,10 @@ mcp = ["mcp[cli]>=1.0"]
 dev = ["pytest", "mypy"]
 
 [project.scripts]
-everything = "everything_cli.__main__:main"
-every = "everything_cli.__main__:main"
-ev = "everything_cli.__main__:main"
-everything-mcp = "everything_cli.mcp:main"
+everything = "everything_mcp.__main__:main"
+every = "everything_mcp.__main__:main"
+ev = "everything_mcp.__main__:main"
+everything-mcp = "everything_mcp.mcp:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -54,7 +54,7 @@ module = ["mcp.*", "pydantic"]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
-module = "everything_cli.mcp"
+module = "everything_mcp.mcp"
 disallow_untyped_decorators = false
 warn_return_any = false
 

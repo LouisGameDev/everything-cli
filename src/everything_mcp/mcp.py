@@ -1,10 +1,10 @@
-"""everything-cli MCP server.
+"""everything-mcp MCP server.
 
 Exposes Voidtools Everything file search to AI assistants via the
-Model Context Protocol (MCP).  Requires ``pip install everything-cli[mcp]``.
+Model Context Protocol (MCP).  Requires ``pip install everything-mcp[mcp]``.
 
 Transport: stdio (default).  Launch with ``everything-mcp`` or
-``python -m everything_cli.mcp``.
+``python -m everything_mcp.mcp``.
 """
 # pyright: reportMissingImports=false
 
@@ -16,7 +16,7 @@ from typing import Annotated
 from mcp.server.fastmcp import FastMCP
 from pydantic import Field
 
-from everything_cli import Everything, EverythingError
+from everything_mcp import Everything, EverythingError
 
 mcp = FastMCP(
     "everything",

@@ -1,4 +1,4 @@
-"""everything-cli entry point — flat, grep-like CLI for Everything search."""
+"""everything-mcp entry point — flat, grep-like CLI for Everything search."""
 
 from __future__ import annotations
 
@@ -28,7 +28,6 @@ _EPILOG = textwrap.dedent("""\
       -j/--json    force NDJSON to stdout even on a terminal
       -l/--list    newline-separated full paths (for ForEach-Object, etc.)
       -0/--null    null-separated full paths (for paths with special characters)
-      -q/--quiet   suppress all stderr output
 
     sorting:
       Default sort is modified-date descending (newest first), so -n 5
@@ -187,7 +186,7 @@ def _build_main_parser() -> argparse.ArgumentParser:
     # Output
     parser.add_argument("--color", choices=["auto", "always", "never"], default="auto",
                         help="colorize stderr output (default: auto)")
-    parser.add_argument("-q", "--quiet", action="store_true", help="suppress stderr output (NDJSON only)")
+
     parser.add_argument("-j", "--json", action="store_true",
                         help="force NDJSON to stdout even when interactive (auto when piped)")
     parser.add_argument("-l", "--list", action="store_true",
@@ -308,7 +307,7 @@ def main(argv: list[str] | None = None) -> None:
             match_path=ns.path,
             match_whole_word=ns.whole_word,
             regex=ns.regex,
-            quiet=ns.quiet or stdout_piped_c,
+            quiet=stdout_piped_c,
             emit_json=emit_json,
             instance=inst,
         ))
@@ -328,8 +327,10 @@ def main(argv: list[str] | None = None) -> None:
     elif getattr(ns, 'list', False):
         list_sep = "\n"
 
-    # When piping out, silence stderr (quiet) — only data flows through
-    quiet = ns.quiet or (stdout_piped and list_sep is None)
+    # Silence stderr when an explicit output format is requested (-j, -l, -0)
+    # or when stdout is piped — only data flows through.
+    explicit_output = ns.json or list_sep is not None
+    quiet = explicit_output or (stdout_piped and list_sep is None)
 
     if stdin_piped and not ns.search:
         emit_json = (ns.json or stdout_piped) and list_sep is None

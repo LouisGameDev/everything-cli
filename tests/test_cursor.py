@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from everything_cli.cursor import Cursor
-from everything_cli.row import Row
+from everything_mcp.cursor import Cursor
+from everything_mcp.row import Row
 
 
 # -- Helpers ---------------------------------------------------------------
