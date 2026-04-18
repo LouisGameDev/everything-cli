@@ -27,7 +27,8 @@
 | | [Instance Management](#instance-management) | Multi-version Everything, `--instance`, env var |
 | | [Service Info](#service-info) | `--version`, `--info`, `--instances` |
 | **Python API** | [Python API](#python-api) | `search()`, `count()`, `Cursor`, `Row`, `Everything` class, error handling |
-| **Internals** | [Architecture](#architecture) | Module layout, IPC approach |
+| **Internals** | [Versioning](#versioning) | CalVer scheme, release workflow |
+| | [Architecture](#architecture) | Module layout, IPC approach |
 | | [MCP Server](#mcp-server) | `search_files`, `count_files`, `aggregate_files`, `get_everything_info` tools |
 | | [Development](#development) | Clone, install, type-check, test |
 | | [See Also](#see-also) | External links |
@@ -888,6 +889,37 @@ search_files(query="ext:py size:>50kb dm:thisweek", sort="size", descending=true
 > How much space do my images use, broken down by format?
 
 aggregate_files(query="ext:jpg;png;gif;webp;heic;svg", group_by="ext", sort_by="total_size")
+```
+
+## Versioning
+
+everyfile uses **CalVer** — `YYYY.M.D` (no leading zeros).
+
+| Where | Example | Notes |
+|-------|---------|-------|
+| PyPI | `2026.4.18` | `pip install everyfile==2026.4.18` |
+| Git tag | `v2026.4.18` | `git checkout v2026.4.18` |
+| ClawHub | `2026.4.18` | `openclaw skills install everyfile@2026.4.18` |
+
+Same-day patch releases append a pre-release suffix: `2026.4.18-2`, `2026.4.18-3`, etc.
+
+### Release workflow
+
+```powershell
+# 1. Bump version in pyproject.toml
+#    version = "2026.4.18"   (or "2026.4.18-2" for same-day patches)
+
+# 2. Commit, tag, push
+git add pyproject.toml
+git commit -m "release: v2026.4.18"
+git tag v2026.4.18
+git push && git push --tags
+
+# 3. Publish to PyPI
+python -m build && twine upload dist/*
+
+# 4. Publish to ClawHub
+clawhub publish .agents/skills/everyfile --slug everyfile --version 2026.4.18
 ```
 
 ## Development

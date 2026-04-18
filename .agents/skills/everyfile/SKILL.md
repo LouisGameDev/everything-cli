@@ -16,7 +16,7 @@ license: MIT
 compatibility: >
   Requires Windows, Python >= 3.11, and Voidtools Everything (1.4, 1.5, or 1.5a)
   running in the background.
-metadata: {"author": "LouisGameDev", "version": "2026.04.18", "openclaw": {"os": ["win32"], "requires": {"bins": ["ev"]}, "install": [{"id": "pip", "kind": "node", "package": "everyfile", "bins": ["ev", "every", "everyfile"], "label": "Install everyfile (pip install everyfile)", "os": ["win32"]}]}}
+metadata: {"author": "LouisGameDev", "version": "2026.4.18", "openclaw": {"os": ["win32"], "requires": {"bins": ["ev"]}, "install": [{"id": "pip", "kind": "node", "package": "everyfile", "bins": ["ev", "every", "everyfile"], "label": "Install everyfile (pip install everyfile)", "os": ["win32"]}]}}
 ---
 
 # everyfile

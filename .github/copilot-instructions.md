@@ -9,7 +9,7 @@
 - **Language:** Python ≥ 3.11, stdlib only (zero external dependencies)
 - **Platform:** Windows only (NTFS MFT + Windows IPC)
 - **Build:** setuptools via `pyproject.toml`
-- **Version scheme:** CalVer (`YYYY.MM.DD`)
+- **Version scheme:** CalVer (`YYYY.M.D`, no leading zeros)
 - **Entry points:** `everything`, `every`, `ev` (all identical)
 
 ## Code Conventions
