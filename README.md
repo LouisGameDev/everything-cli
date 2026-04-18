@@ -14,6 +14,7 @@
 | | [Python API](#python-api--search-files-from-code) | `from everyfile import search` |
 | | [MCP Server](#mcp-server--give-ai-assistants-file-search) | `pip install everyfile[mcp]` + client config |
 | | [Agent Skill](#agent-skill--teach-any-ai-agent-to-use-everything) | `npx skills add LouisGameDev/everyfile` |
+| | [OpenClaw](#openclaw--use-everything-from-openclaw-agents) | Skill + MCP for OpenClaw gateway agents |
 | | [Install from source](#install-from-source) | Editable dev install |
 | | [Command aliases](#command-aliases) | `ev`, `every`, `everyfile` |
 | **CLI** | [Quick Start](#quick-start) | First commands to try |
@@ -178,6 +179,49 @@ npx skills add ./path/to/everyfile -g
 ```
 
 The skill teaches agents *when* and *how* to use `ev`, the Python API, and the MCP tools — with search syntax, safety guidelines, and decision logic included.
+
+## OpenClaw — use Everything from OpenClaw agents
+
+If you run [OpenClaw](https://openclaw.ai/), you can give your agents instant file search on Windows.
+
+**Install the skill** (via [ClawHub](https://clawhub.ai/) or manually):
+
+```bash
+openclaw skills install everyfile
+```
+
+Or copy the skill folder manually into your workspace:
+
+```bash
+cp -r .agents/skills/everyfile <workspace>/skills/everyfile
+```
+
+**Install the Python package** (the skill gates on the `ev` binary):
+
+```powershell
+pip install everyfile
+```
+
+**Optional: add the MCP server** for tool-level access from any agent:
+
+```powershell
+pip install everyfile[mcp]
+```
+
+Then add to your agent's MCP config or `openclaw.json`:
+
+```jsonc
+// In openclaw.json → tools or agent-level MCP config
+{
+  "mcpServers": {
+    "everything": {
+      "command": "everyfile-mcp"
+    }
+  }
+}
+```
+
+The skill auto-gates on `win32` and requires `ev` on PATH. Once installed, your OpenClaw agents will use Everything for all file discovery instead of slow filesystem traversals.
 
 ## Install from source
 
