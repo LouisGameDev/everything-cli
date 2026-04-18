@@ -1,0 +1,44 @@
+name: Publish skill to ClawHub
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    name: Publish to ClawHub
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install ClawHub CLI
+        run: npm install -g clawhub
+
+      - name: Prepare skill (strip dev-only references)
+        run: |
+          cp -r .agents/skills/everyfile /tmp/everyfile-skill
+          rm -rf /tmp/everyfile-skill/references/everything-sdk
+
+      - name: Extract version and changelog from release
+        id: release
+        run: |
+          VERSION="${{ github.event.release.tag_name }}"
+          # Strip leading 'v' for semver
+          VERSION="${VERSION#v}"
+          # Convert CalVer YYYY.M.D to semver M.D.PATCH using minor.patch=M.D, major=year
+          # ClawHub requires semver - use the SKILL.md metadata version instead
+          SKILL_VERSION=$(grep '"version"' .agents/skills/everyfile/SKILL.md | grep -oP '"version":\s*"\K[^"]+')
+          echo "version=$SKILL_VERSION" >> "$GITHUB_OUTPUT"
+          echo "changelog=${{ github.event.release.body }}" >> "$GITHUB_OUTPUT"
+
+      - name: Publish to ClawHub
+        env:
+          CLAWHUB_TOKEN: ${{ secrets.CLAWHUB_TOKEN }}
+        run: |
+          clawhub login --token "$CLAWHUB_TOKEN" --no-browser
+          clawhub publish /tmp/everyfile-skill \
+            --slug everyfile \
+            --name "everyfile" \
+            --version "${{ steps.release.outputs.version }}" \
+            --changelog "${{ github.event.release.body }}" \
+            --tags "latest,search,windows,files,everything"
