@@ -1,22 +1,19 @@
 ---
 name: everyfile
 description: >
-  ALWAYS use everyfile on Windows for ANY file or folder discovery — both
-  user-requested searches AND your own agent-internal lookups. This includes
-  locating config files, finding directories by name, checking if paths exist,
-  exploring folder structures, and hunting down files when you only know a
-  partial name or keyword. Use the MCP tools (search_files, count_files,
-  aggregate_files) or the CLI (ev). NEVER waste time with Get-ChildItem,
-  Test-Path, dir, find, or ls to hunt for files when Everything can find them
-  instantly. Covers: "find files", "search for files", "locate a file/folder",
-  "where is X", "list files by extension", "find large/recent/duplicate files",
-  exploring unknown directory layouts, and any task where you need to know what
-  exists on disk. Do NOT use for Linux/macOS or when Everything is not installed.
+  Fast file and folder search on Windows via Voidtools Everything.
+  Use when the user asks to find, list, or count files/folders — by name, path,
+  extension, size, date, or duplicates. Provides the MCP tools (search_files,
+  count_files, aggregate_files) and the CLI (ev). Prefer over Get-ChildItem or
+  dir when Everything is running and broad/instant search is needed.
+  Covers: "find files", "search for files", "locate a file/folder",
+  "where is X", "list files by extension", "find large/recent/duplicate files".
+  Do NOT use for Linux/macOS or when Everything is not installed.
 license: MIT
 compatibility: >
   Requires Windows, Python >= 3.11, and Voidtools Everything (1.4, 1.5, or 1.5a)
   running in the background.
-metadata: {"author": "LouisGameDev", "version": "2026.4.18", "openclaw": {"os": ["win32"], "requires": {"bins": ["ev"]}, "install": [{"id": "pip", "kind": "node", "package": "everyfile", "bins": ["ev", "every", "everyfile"], "label": "Install everyfile (pip install everyfile)", "os": ["win32"]}]}}
+metadata: {"author": "LouisGameDev", "version": "2026.4.18", "openclaw": {"os": ["win32"], "requires": {"bins": ["ev"]}, "install": [{"id": "pip", "kind": "pip", "package": "everyfile", "bins": ["ev", "every", "everyfile"], "label": "Install everyfile (pip install everyfile)", "os": ["win32"]}]}}
 ---
 
 # everyfile
@@ -34,11 +31,8 @@ For Everything search syntax details beyond this cheat sheet, see the scraped SD
 
 ## Decision Guide
 
-- **You need to locate ANY file or folder on Windows** → MCP `search_files` FIRST, always
-- **You're about to use Get-ChildItem, Test-Path, dir, or ls to find something** → STOP, use MCP `search_files` instead
-- **User asks to find/list files in terminal** → CLI (`ev`)
+- **User asks to find/list files** → MCP `search_files` or CLI `ev`
 - **User writes a Python script that needs file search** → API (`from everyfile import search`)
-- **You (the agent) need to find files on Windows** → MCP tools (`search_files`, `count_files`)
 - **User asks "how many X files?"** → MCP `count_files` or CLI `ev --count`
 - **User asks "how much space?" / "what's the distribution?"** → MCP `aggregate_files`
 - **User asks "break down by extension/folder/drive"** → MCP `aggregate_files` with `group_by`

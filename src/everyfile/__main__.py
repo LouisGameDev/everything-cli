@@ -231,6 +231,52 @@ def _build_pick_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _stdin_has_data() -> bool:
+    """Non-blocking check whether piped stdin has data available.
+
+    Distinguishes real pipe composition (``ev | ev``) from subprocess
+    invocations where stdin is a non-TTY pipe with no NDJSON data.
+    Uses Win32 PeekNamedPipe; returns False on any error.
+    """
+    try:
+        import ctypes                          # noqa: PLC0415
+        import msvcrt                          # noqa: PLC0415
+        import time                            # noqa: PLC0415
+        from ctypes import wintypes            # noqa: PLC0415
+
+        handle = msvcrt.get_osfhandle(sys.stdin.fileno())
+        file_type = ctypes.windll.kernel32.GetFileType(wintypes.HANDLE(handle))
+
+        if file_type == 0x0001:                # FILE_TYPE_DISK — redirected file
+            return True
+        if file_type != 0x0003:                # Not FILE_TYPE_PIPE
+            return False
+
+        avail = wintypes.DWORD(0)
+        ok = ctypes.windll.kernel32.PeekNamedPipe(
+            wintypes.HANDLE(handle), None, wintypes.DWORD(0),
+            None, ctypes.byref(avail), None,
+        )
+        if not ok:
+            return False                       # Broken / closed pipe
+        if avail.value > 0:
+            return True
+
+        # In real pipe composition the upstream ev writes within a few ms.
+        # One short wait avoids a race when data hasn't arrived yet.
+        time.sleep(0.015)
+
+        ok = ctypes.windll.kernel32.PeekNamedPipe(
+            wintypes.HANDLE(handle), None, wintypes.DWORD(0),
+            None, ctypes.byref(avail), None,
+        )
+        if not ok:
+            return False
+        return avail.value > 0
+    except (OSError, ValueError, ImportError):
+        return False
+
+
 def main(argv: list[str] | None = None) -> None:
     args = argv if argv is not None else sys.argv[1:]
 
@@ -316,8 +362,8 @@ def main(argv: list[str] | None = None) -> None:
         parser.print_help(sys.stderr)
         sys.exit(1)
 
-    # Pipe composition: if stdin is piped NDJSON (and not --search), filter locally
-    stdin_piped = not sys.stdin.isatty()
+    # Pipe composition: if stdin has NDJSON data (and not --search), filter locally
+    stdin_piped = not sys.stdin.isatty() and _stdin_has_data()
     stdout_piped = not sys.stdout.isatty()
 
     # --list / --null → plain path output
