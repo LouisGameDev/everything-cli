@@ -4,6 +4,27 @@
 [![PyPI](https://img.shields.io/pypi/v/everyfile)](https://pypi.org/project/everyfile/)
 [![ClawHub](https://img.shields.io/badge/ClawHub-everyfile-blue)](https://clawhub.ai/louisgamedev/everyfile)
 
+> **Find any file on Windows in milliseconds — no indexing wait, no recursion, no guessing.**
+
+Windows has 100 million+ files. Agents and workflows that navigate them with `Get-ChildItem`, `os.walk`, or `glob` are flying blind — slow, fragile, and context-starved. `everyfile` changes that.
+
+Backed by [Voidtools Everything](https://www.voidtools.com/)'s real-time NTFS index, every query resolves in **< 1 ms** regardless of drive size. An agent that would previously need to recurse directories, guess paths, and timeout now gets an **instant, exact answer** — with size, dates, attributes, and duplicate detection built in.
+
+```powershell
+# What used to take 30 seconds of recursion...
+ev ext:py dm:thisweek size:>10kb parent:C:\Projects
+
+# ...now returns in under a millisecond.
+```
+
+Three integration surfaces cover every use case:
+
+| Surface | Best for |
+|---------|----------|
+| **CLI** (`ev`) | Shell scripts, pipelines, terminal power users |
+| **Python API** | Scripts and tools that iterate results programmatically |
+| **MCP Server** | AI agents calling `search_files`, `count_files`, `aggregate_files` as tools |
+
 ## Table of Contents
 
 | | Section | What's inside |
