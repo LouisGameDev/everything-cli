@@ -2,6 +2,8 @@
 
 [![CI](https://github.com/LouisGameDev/everyfile/actions/workflows/ci.yml/badge.svg)](https://github.com/LouisGameDev/everyfile/actions/workflows/ci.yml)
 
+[What is Everything?](#what-is-everything) · [Getting Started](#getting-started) · [CLI](#quick-start) · [Python API](#python-api) · [MCP Server](#mcp-server) · [Agent Skill](#agent-skill--teach-any-ai-agent-to-use-everything) · [Search Syntax](#everything-search-syntax) · [Examples](#examples) · [Development](#development)
+
 A zero-dependency Python CLI for [Voidtools Everything](https://www.voidtools.com/) search.
 
 ```powershell
@@ -31,15 +33,15 @@ Everything runs as a small background process (~15 MB of RAM for 1 million files
 
 ### Why not just use Windows Search?
 
-| | **Everything** | **Windows Search** | **`Get-ChildItem -Recurse`** | **`fd`** / **`find`** |
-|---|---|---|---|---|
-| **Speed** | **~10 ms** for any query | Seconds to minutes; often misses files | Traverses the entire filesystem every time | Traverses the filesystem every time |
-| **Completeness** | Every file and folder on all NTFS volumes | Only indexes "included locations"; skips system dirs, app data, etc. | Complete, but slow | Complete, but slow |
-| **Index size** | ~75 MB for 1 M files | Hundreds of MB to GB, with CPU spikes during re-indexing | No index (brute-force walk) | No index (brute-force walk) |
-| **Startup** | Indexes a fresh 1 M-file drive in ~1 s | Initial indexing can take **hours** | N/A | N/A |
-| **Advanced filters** | `ext:`, `size:`, `dm:`, `dupe:`, `regex:`, `content:`, `parent:`, macros | Basic filters, inconsistent behaviour | `-Filter`, `-Include` flags | `-e`, `-S`, `--size` flags |
-| **Real-time updates** | Via NTFS USN journal — instant | Periodic, often delayed minutes | N/A | N/A |
-| **Resource usage** | ~15 MB RAM | Heavy (SearchIndexer.exe) | Spikes CPU/disk during scan | Spikes CPU/disk during scan |
+| | **Everything** | **Windows Search** | **`Get-ChildItem -Recurse`** |
+|---|---|---|---|
+| **Speed** | **~10 ms** for any query | Seconds to minutes; often misses files | Traverses the entire filesystem every time |
+| **Completeness** | Every file and folder on all NTFS volumes | Only indexes "included locations"; skips system dirs, app data, etc. | Complete, but slow |
+| **Index size** | ~75 MB for 1 M files | Hundreds of MB to GB, with CPU spikes during re-indexing | No index (brute-force walk) |
+| **Startup** | Indexes a fresh 1 M-file drive in ~1 s | Initial indexing can take **hours** | N/A |
+| **Advanced filters** | `ext:`, `size:`, `dm:`, `dupe:`, `regex:`, `content:`, `parent:`, macros | Basic filters, inconsistent behaviour | `-Filter`, `-Include` flags |
+| **Real-time updates** | Via NTFS USN journal — instant | Periodic, often delayed minutes | N/A |
+| **Resource usage** | ~15 MB RAM | Heavy (SearchIndexer.exe) | Spikes CPU/disk during scan |
 
 ### See the difference yourself
 
@@ -74,34 +76,101 @@ The difference grows with drive size. On multi-drive systems with millions of fi
 - **Multi-instance support** — works with Everything 1.4, 1.5, and 1.5a side by side
 - **Pure Python IPC** — communicates via ctypes `SendMessageW` / `WM_COPYDATA`, no DLL required
 
-## Requirements
+## Getting Started
 
-- **Windows** (Everything uses NTFS and Windows IPC)
-- **Python ≥ 3.11**
-- **[Voidtools Everything](https://www.voidtools.com/downloads/)** running in the background (1.4, 1.5, or 1.5a)
+### Prerequisites
 
-## Installation
+1. **Windows** — Everything uses NTFS and Windows IPC
+2. **Python ≥ 3.11**
+3. **[Voidtools Everything](https://www.voidtools.com/downloads/)** running in the background
+
+> **New to Everything?** Download [Everything 1.5a](https://www.voidtools.com/downloads/#alpha) (recommended). It's the latest alpha with the most features, runs alongside stable versions, and is what most power users run. Install it, let it index your drives (takes ~1 second), and leave it running in the system tray.
+
+### Install
+
+Pick what you need — each layer builds on the one before it.
+
+#### CLI — search files from the terminal
 
 ```powershell
-pip install everyfile            # CLI + Python API
-pip install everyfile[mcp]       # + MCP server for AI assistants
+pip install everyfile
 ```
 
-Or install from source:
+This gives you the `ev` command (plus `every` and `everyfile` as aliases):
 
 ```powershell
-pip install git+https://github.com/LouisGameDev/everyfile.git
+ev ext:py                          # find all Python files instantly
+ev ext:log size:>1mb dm:today      # large log files modified today
+ev server.py -n 1 -l | code -     # open first match in VS Code
 ```
 
-This registers three identical command aliases:
+#### Python API — search files from code
+
+Same package, just import it:
+
+```python
+from everyfile import search, count
+
+for row in search("ext:py dm:today", limit=10):
+    print(row.name, row.full_path)
+
+print(f"Total Python files: {count('ext:py')}")
+```
+
+#### MCP Server — give AI assistants file search
+
+```powershell
+pip install everyfile[mcp]
+```
+
+Add to your MCP client config (VS Code `settings.json`, Claude Desktop, etc.):
+
+```jsonc
+{
+  "mcpServers": {
+    "everything": {
+      "command": "everyfile-mcp"
+    }
+  }
+}
+```
+
+Your AI assistant can now call `search_files`, `count_files`, and `get_everything_info` directly.
+
+#### Agent Skill — teach any AI agent to use Everything
+
+Install to any [Agent Skills](https://agentskills.io/)-compatible agent (Copilot, Claude Code, Cursor, Codex, and [40+ more](https://agentskills.io/clients)):
+
+```powershell
+npx skills add LouisGameDev/everyfile -g
+```
+
+Or install from a local clone:
+
+```powershell
+npx skills add ./path/to/everyfile -g
+```
+
+The skill teaches agents *when* and *how* to use `ev`, the Python API, and the MCP tools — with search syntax, safety guidelines, and decision logic included.
+
+### Install from source
+
+```powershell
+git clone https://github.com/LouisGameDev/everyfile.git
+cd everyfile
+pip install -e ".[dev]"           # editable install with dev tools
+pip install -e ".[dev,mcp]"       # + MCP server
+```
+
+### Command aliases
+
+All three run the same binary. Examples in this README use `ev`.
 
 ```powershell
 everyfile ext:py           # full name
 every ext:py               # short form
 ev ext:py                  # shortest — recommended for daily use
 ```
-
-All three run the same binary. Examples in this README use `ev`.
 
 ## Quick Start
 
@@ -548,10 +617,6 @@ Active instance: 1.5a
 
 `everyfile` is also a fully importable Python library — no CLI needed. The API uses DB-API 2.0 cursor/row semantics, is fully type-annotated, and has zero dependencies.
 
-```powershell
-pip install everyfile
-```
-
 ### Quick Start
 
 ```python
@@ -730,25 +795,7 @@ src/everyfile/
 
 ## MCP Server
 
-`everyfile` includes an [MCP](https://modelcontextprotocol.io/) server that exposes Everything search to AI assistants like GitHub Copilot, Claude, and any MCP-compatible client.
-
-### Setup
-
-```powershell
-pip install everyfile[mcp]
-```
-
-Add to your MCP client config (VS Code `mcp.json`, Claude Desktop, etc.):
-
-```jsonc
-{
-  "mcpServers": {
-    "everything": {
-      "command": "everyfile-mcp"
-    }
-  }
-}
-```
+`everyfile` includes an [MCP](https://modelcontextprotocol.io/) server that exposes Everything search to AI assistants like GitHub Copilot, Claude, and any MCP-compatible client. See [Getting Started](#install) for setup.
 
 ### Tools
 
@@ -771,18 +818,15 @@ search_files(query="ext:py size:>50kb dm:thisweek", sort="size", descending=true
 ## Development
 
 ```powershell
-python -m venv .venv
-.venv\Scripts\activate
-pip install -e ".[dev]"
+git clone https://github.com/LouisGameDev/everyfile.git
+cd everyfile
+pip install -e ".[dev,mcp]"
 
 # Type check
 mypy src/
 
 # Test (requires Everything running for integration tests)
 pytest
-
-# Install with MCP dependencies
-pip install -e ".[dev,mcp]"
 ```
 
 ## See Also

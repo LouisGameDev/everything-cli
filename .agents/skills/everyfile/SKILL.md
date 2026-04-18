@@ -12,6 +12,9 @@ license: MIT
 compatibility: >
   Requires Windows, Python >= 3.11, and Voidtools Everything (1.4, 1.5, or 1.5a)
   running in the background.
+metadata:
+  author: LouisGameDev
+  version: "2026.04.18"
 ---
 
 # everyfile
@@ -21,11 +24,11 @@ Three interfaces — choose based on context:
 
 | Interface | When to use | Reference |
 |-----------|-------------|-----------|
-| **CLI** (`ev`) | Terminal commands, shell scripts, piping results between commands | [cli.md](cli.md) |
-| **Python API** | Python scripts/tools that need programmatic file search, Cursor/Row iteration | [api.md](api.md) |
-| **MCP Tools** | AI assistants calling `search_files`, `count_files`, `get_everything_info` via MCP | [mcp.md](mcp.md) |
+| **CLI** (`ev`) | Terminal commands, shell scripts, piping results between commands | [cli.md](references/cli.md) |
+| **Python API** | Python scripts/tools that need programmatic file search, Cursor/Row iteration | [api.md](references/api.md) |
+| **MCP Tools** | AI assistants calling `search_files`, `count_files`, `get_everything_info` via MCP | [mcp.md](references/mcp.md) |
 
-For Everything search syntax details beyond this cheat sheet, see the scraped SDK docs in [everything-sdk/](everything-sdk/) (especially [everything-sdk/index.md](everything-sdk/index.md) for search syntax and [everything-sdk/ipc.md](everything-sdk/ipc.md) for IPC internals).
+For Everything search syntax details beyond this cheat sheet, see the scraped SDK docs in [everything-sdk/](references/everything-sdk/) (especially [everything-sdk/index.md](references/everything-sdk/index.md) for search syntax and [everything-sdk/ipc.md](references/everything-sdk/ipc.md) for IPC internals).
 
 ## Decision Guide
 
