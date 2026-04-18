@@ -1,4 +1,4 @@
-"""everything-mcp entry point — flat, grep-like CLI for Everything search."""
+"""everyfile entry point — flat, grep-like CLI for Everything search."""
 
 from __future__ import annotations
 

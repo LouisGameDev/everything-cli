@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from everything_mcp.row import Row
+from everyfile.row import Row
 
 
 # -- Fixtures --------------------------------------------------------------

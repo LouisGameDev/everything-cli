@@ -1,4 +1,4 @@
-# everything-mcp — MCP Tools Reference
+# everyfile — MCP Tools Reference
 
 Three MCP tools for instant file search via Voidtools Everything.
 Available when the `everything` MCP server is configured.
@@ -10,13 +10,13 @@ Available when the `everything` MCP server is configured.
 {
   "mcpServers": {
     "everything": {
-      "command": "everything-mcp"
+      "command": "everyfile-mcp"
     }
   }
 }
 ```
 
-Requires: `pip install everything-mcp[mcp]`
+Requires: `pip install everyfile[mcp]`
 
 ## Tools
 

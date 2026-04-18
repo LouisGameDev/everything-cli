@@ -54,7 +54,7 @@ def version_info(
 ) -> None:
     """Print version to stderr."""
     ev_part = f"Everything {ev_version}" if ev_version else "Everything: not available"
-    line = f"everything-mcp {cli_version} (Python {python_version}) / {ev_part}"
+    line = f"everyfile {cli_version} (Python {python_version}) / {ev_part}"
     if instance_name:
         line += f"\nInstance: {instance_name}"
         if instance_source:

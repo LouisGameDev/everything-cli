@@ -1,6 +1,6 @@
-# everything-mcp
+# everyfile
 
-[![CI](https://github.com/LouisGameDev/everything-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/LouisGameDev/everything-mcp/actions/workflows/ci.yml)
+[![CI](https://github.com/LouisGameDev/everyfile/actions/workflows/ci.yml/badge.svg)](https://github.com/LouisGameDev/everyfile/actions/workflows/ci.yml)
 
 A zero-dependency Python CLI for [Voidtools Everything](https://www.voidtools.com/) search.
 
@@ -83,20 +83,20 @@ The difference grows with drive size. On multi-drive systems with millions of fi
 ## Installation
 
 ```powershell
-pip install everything-mcp            # CLI + Python API
-pip install everything-mcp[mcp]       # + MCP server for AI assistants
+pip install everyfile            # CLI + Python API
+pip install everyfile[mcp]       # + MCP server for AI assistants
 ```
 
 Or install from source:
 
 ```powershell
-pip install git+https://github.com/LouisGameDev/everything-mcp.git
+pip install git+https://github.com/LouisGameDev/everyfile.git
 ```
 
 This registers three identical command aliases:
 
 ```powershell
-everything ext:py          # full name
+everyfile ext:py           # full name
 every ext:py               # short form
 ev ext:py                  # shortest — recommended for daily use
 ```
@@ -526,7 +526,7 @@ Priority: `--instance` flag > `$EVERYTHING_INSTANCE` env var > auto-detect.
 
 ```
 $ ev --version
-everything-mcp 2026.04.15 (Python 3.13.5) / Everything 1.5.0.1404
+everyfile 2026.04.15 (Python 3.13.5) / Everything 1.5.0.1404
 Instance: 1.5a  (via auto-detect)
 
 $ ev --info
@@ -546,16 +546,16 @@ Active instance: 1.5a
 
 ## Python API
 
-`everything-mcp` is also a fully importable Python library — no CLI needed. The API uses DB-API 2.0 cursor/row semantics, is fully type-annotated, and has zero dependencies.
+`everyfile` is also a fully importable Python library — no CLI needed. The API uses DB-API 2.0 cursor/row semantics, is fully type-annotated, and has zero dependencies.
 
 ```powershell
-pip install everything-mcp
+pip install everyfile
 ```
 
 ### Quick Start
 
 ```python
-from everything_mcp import search, count
+from everyfile import search, count
 
 # Iterate results
 for row in search("ext:py"):
@@ -568,7 +568,7 @@ print(f"Python files: {count('ext:py')}")
 ### Search with Options
 
 ```python
-from everything_mcp import search
+from everyfile import search
 
 # Find the 10 largest log files
 cursor = search(
@@ -591,7 +591,7 @@ Parameters: `query`, `fields`, `sort`, `descending`, `limit`, `offset`, `match_c
 `search()` returns a `Cursor` — a forward-only iterator with DB-API 2.0 fetch methods.
 
 ```python
-from everything_mcp import search
+from everyfile import search
 
 cursor = search("ext:py", limit=100)
 
@@ -624,7 +624,7 @@ while batch := cursor.fetchmany(500):
 Each result is a `Row` with typed properties and dict-style access.
 
 ```python
-from everything_mcp import search
+from everyfile import search
 
 for row in search("ext:py dm:today", fields="size,dates"):
     # Typed properties (IDE autocomplete works)
@@ -650,7 +650,7 @@ for row in search("ext:py dm:today", fields="size,dates"):
 For repeated queries or service introspection, create an `Everything` instance.
 
 ```python
-from everything_mcp import Everything
+from everyfile import Everything
 
 ev = Everything()               # auto-detect running instance
 # ev = Everything("1.5a")      # target a specific instance
@@ -673,7 +673,7 @@ for inst in Everything.instances():
 ### Error Handling
 
 ```python
-from everything_mcp import search, EverythingError
+from everyfile import search, EverythingError
 
 try:
     results = search("ext:py").fetchall()
@@ -687,7 +687,7 @@ except EverythingError as e:
 ### Fields and Sorting
 
 ```python
-from everything_mcp import search
+from everyfile import search
 
 # Field groups: "default", "all", "dates", "meta", "hl"
 search("*.py", fields="all")            # every available field
@@ -705,7 +705,7 @@ For the full API reference, see [docs/PYTHON_API_SPEC.md](docs/PYTHON_API_SPEC.m
 ## Architecture
 
 ```
-src/everything_mcp/
+src/everyfile/
   __main__.py        CLI entry point, argparse, dispatch
   search.py          Search orchestration, pipe filter, count, info, version
   filter.py          Structured NDJSON filter (ev filter)
@@ -730,12 +730,12 @@ src/everything_mcp/
 
 ## MCP Server
 
-`everything-mcp` includes an [MCP](https://modelcontextprotocol.io/) server that exposes Everything search to AI assistants like GitHub Copilot, Claude, and any MCP-compatible client.
+`everyfile` includes an [MCP](https://modelcontextprotocol.io/) server that exposes Everything search to AI assistants like GitHub Copilot, Claude, and any MCP-compatible client.
 
 ### Setup
 
 ```powershell
-pip install everything-mcp[mcp]
+pip install everyfile[mcp]
 ```
 
 Add to your MCP client config (VS Code `mcp.json`, Claude Desktop, etc.):
@@ -744,7 +744,7 @@ Add to your MCP client config (VS Code `mcp.json`, Claude Desktop, etc.):
 {
   "mcpServers": {
     "everything": {
-      "command": "everything-mcp"
+      "command": "everyfile-mcp"
     }
   }
 }

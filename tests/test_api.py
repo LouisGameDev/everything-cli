@@ -11,9 +11,9 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from everything_mcp import Everything, Cursor, Row, EverythingError, search, count
-from everything_mcp.api import _resolve_sort
-from everything_mcp.sdk.constants import SortType
+from everyfile import Everything, Cursor, Row, EverythingError, search, count
+from everyfile.api import _resolve_sort
+from everyfile.sdk.constants import SortType
 
 
 # -- Helpers ---------------------------------------------------------------
@@ -61,7 +61,7 @@ class TestResolveSort:
         assert _resolve_sort("modified", descending=True) == SortType.DATE_MODIFIED_DESCENDING
 
     def test_all_valid_names(self) -> None:
-        from everything_mcp.sdk.constants import SORT_NAME_MAP
+        from everyfile.sdk.constants import SORT_NAME_MAP
         for name in SORT_NAME_MAP:
             asc = _resolve_sort(name, descending=False)
             desc = _resolve_sort(name, descending=True)
@@ -78,8 +78,8 @@ class TestResolveSort:
 
 # -- Everything class ------------------------------------------------------
 
-@patch("everything_mcp.api.resolve_fields", return_value=["name", "path", "full_path"])
-@patch("everything_mcp.api._list_instances", return_value=[])
+@patch("everyfile.api.resolve_fields", return_value=["name", "path", "full_path"])
+@patch("everyfile.api._list_instances", return_value=[])
 class TestEverythingClass:
     """Tests for Everything using mocked IPC layer.
 
@@ -87,7 +87,7 @@ class TestEverythingClass:
     receives a MagicMock instead of a real IPC client.
     """
 
-    @patch("everything_mcp.api.EverythingAPI")
+    @patch("everyfile.api.EverythingAPI")
     def test_search_returns_cursor(self, MockAPI: MagicMock, _li: Any, _rf: Any) -> None:
         mock_api = _mock_api()
         mock_api.search.return_value = iter(SAMPLE_ROWS)
@@ -101,7 +101,7 @@ class TestEverythingClass:
         assert cursor.total == 3
         assert cursor.count == 3
 
-    @patch("everything_mcp.api.EverythingAPI")
+    @patch("everyfile.api.EverythingAPI")
     def test_search_cursor_yields_rows(self, MockAPI: MagicMock, _li: Any, _rf: Any) -> None:
         mock_api = _mock_api()
         mock_api.search.return_value = iter(SAMPLE_ROWS)
@@ -116,7 +116,7 @@ class TestEverythingClass:
         assert rows[0].name == "a.py"
         assert rows[2].full_path == "C:\\Src\\c.py"
 
-    @patch("everything_mcp.api.EverythingAPI")
+    @patch("everyfile.api.EverythingAPI")
     def test_count_returns_int(self, MockAPI: MagicMock, _li: Any, _rf: Any) -> None:
         mock_api = _mock_api()
         mock_api.search.return_value = iter([])
@@ -128,7 +128,7 @@ class TestEverythingClass:
         assert result == 42
         assert isinstance(result, int)
 
-    @patch("everything_mcp.api.EverythingAPI")
+    @patch("everyfile.api.EverythingAPI")
     def test_count_passes_flags(self, MockAPI: MagicMock, _li: Any, _rf: Any) -> None:
         mock_api = _mock_api()
         mock_api.search.return_value = iter([])
@@ -142,7 +142,7 @@ class TestEverythingClass:
         assert call_kwargs["regex"] is True
         assert call_kwargs["max_results"] == 0
 
-    @patch("everything_mcp.api.EverythingAPI")
+    @patch("everyfile.api.EverythingAPI")
     def test_search_with_limit_and_offset(self, MockAPI: MagicMock, _li: Any, _rf: Any) -> None:
         mock_api = _mock_api()
         mock_api.search.return_value = iter(SAMPLE_ROWS[:2])
@@ -159,7 +159,7 @@ class TestEverythingClass:
         assert call_kwargs["max_results"] == 2
         assert call_kwargs["offset"] == 10
 
-    @patch("everything_mcp.api.EverythingAPI")
+    @patch("everyfile.api.EverythingAPI")
     def test_search_sort_descending(self, MockAPI: MagicMock, _li: Any, _rf: Any) -> None:
         mock_api = _mock_api()
         mock_api.search.return_value = iter([])
@@ -170,7 +170,7 @@ class TestEverythingClass:
         call_kwargs = mock_api.search.call_args[1]
         assert call_kwargs["sort"] == SortType.SIZE_DESCENDING
 
-    @patch("everything_mcp.api.EverythingAPI")
+    @patch("everyfile.api.EverythingAPI")
     def test_search_invalid_sort_raises(self, MockAPI: MagicMock, _li: Any, _rf: Any) -> None:
         MockAPI.return_value = _mock_api()
 
@@ -178,7 +178,7 @@ class TestEverythingClass:
         with pytest.raises(ValueError, match="Unknown sort field"):
             ev.search("test", sort="nonexistent")
 
-    @patch("everything_mcp.api.EverythingAPI")
+    @patch("everyfile.api.EverythingAPI")
     def test_version_property(self, MockAPI: MagicMock, _li: Any, _rf: Any) -> None:
         mock_api = _mock_api()
         mock_api.get_version.return_value = {
@@ -191,7 +191,7 @@ class TestEverythingClass:
         assert v["major"] == 1
         assert v["build"] == 1000
 
-    @patch("everything_mcp.api.EverythingAPI")
+    @patch("everyfile.api.EverythingAPI")
     def test_info_property(self, MockAPI: MagicMock, _li: Any, _rf: Any) -> None:
         mock_api = _mock_api()
         mock_api.get_info.return_value = {"total_files": 500000}
@@ -200,7 +200,7 @@ class TestEverythingClass:
         ev = Everything()
         assert ev.info["total_files"] == 500000
 
-    @patch("everything_mcp.api.EverythingAPI")
+    @patch("everyfile.api.EverythingAPI")
     def test_instance_name_property(self, MockAPI: MagicMock, _li: Any, _rf: Any) -> None:
         mock_api = _mock_api()
         mock_api.instance_name = "1.5a"
@@ -209,7 +209,7 @@ class TestEverythingClass:
         ev = Everything()
         assert ev.instance_name == "1.5a"
 
-    @patch("everything_mcp.api.EverythingAPI")
+    @patch("everyfile.api.EverythingAPI")
     def test_repr(self, MockAPI: MagicMock, _li: Any, _rf: Any) -> None:
         mock_api = _mock_api()
         mock_api.instance_name = "default"
@@ -226,7 +226,7 @@ class TestEverythingClass:
 class TestModuleFunctions:
     """Tests for search() and count() module-level wrappers."""
 
-    @patch("everything_mcp.api.Everything")
+    @patch("everyfile.api.Everything")
     def test_search_creates_instance_and_delegates(self, MockEv: MagicMock) -> None:
         mock_instance = MockEv.return_value
         mock_cursor = MagicMock(spec=Cursor)
@@ -249,7 +249,7 @@ class TestModuleFunctions:
         )
         assert result is mock_cursor
 
-    @patch("everything_mcp.api.Everything")
+    @patch("everyfile.api.Everything")
     def test_search_passes_instance(self, MockEv: MagicMock) -> None:
         mock_instance = MockEv.return_value
         mock_instance.search.return_value = MagicMock(spec=Cursor)
@@ -257,7 +257,7 @@ class TestModuleFunctions:
         search("test", instance="1.5a")
         MockEv.assert_called_once_with(instance="1.5a")
 
-    @patch("everything_mcp.api.Everything")
+    @patch("everyfile.api.Everything")
     def test_count_creates_instance_and_delegates(self, MockEv: MagicMock) -> None:
         mock_instance = MockEv.return_value
         mock_instance.count.return_value = 99
@@ -274,7 +274,7 @@ class TestModuleFunctions:
         )
         assert result == 99
 
-    @patch("everything_mcp.api.Everything")
+    @patch("everyfile.api.Everything")
     def test_count_passes_flags(self, MockEv: MagicMock) -> None:
         mock_instance = MockEv.return_value
         mock_instance.count.return_value = 5
@@ -306,12 +306,12 @@ class TestErrorHandling:
 
 class TestExports:
     def test_all_public_symbols_importable(self) -> None:
-        import everything_mcp
+        import everyfile
         for name in ["search", "count", "Everything", "Cursor", "Row", "EverythingError"]:
-            assert hasattr(everything_mcp, name), f"{name} not exported"
+            assert hasattr(everyfile, name), f"{name} not exported"
 
     def test_all_matches_exports(self) -> None:
-        import everything_mcp
-        assert set(everything_mcp.__all__) == {
+        import everyfile
+        assert set(everyfile.__all__) == {
             "search", "count", "Everything", "Cursor", "Row", "EverythingError"
         }

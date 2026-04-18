@@ -1,10 +1,10 @@
-"""everything-mcp MCP server.
+"""everyfile MCP server.
 
 Exposes Voidtools Everything file search to AI assistants via the
-Model Context Protocol (MCP).  Requires ``pip install everything-mcp[mcp]``.
+Model Context Protocol (MCP).  Requires ``pip install everyfile[mcp]``.
 
-Transport: stdio (default).  Launch with ``everything-mcp`` or
-``python -m everything_mcp.mcp``.
+Transport: stdio (default).  Launch with ``everyfile-mcp`` or
+``python -m everyfile.mcp``.
 """
 # pyright: reportMissingImports=false
 
@@ -16,7 +16,7 @@ from typing import Annotated
 from mcp.server.fastmcp import FastMCP
 from pydantic import Field
 
-from everything_mcp import Everything, EverythingError
+from everyfile import Everything, EverythingError
 
 mcp = FastMCP(
     "everything",
@@ -124,21 +124,21 @@ def _mcp_error(exc: EverythingError) -> Exception:
 
 
 def main() -> None:
-    """Entry point for ``everything-mcp`` command."""
+    """Entry point for ``everyfile-mcp`` command."""
     import sys
 
     if sys.stdin.isatty():
         print(
-            "everything-mcp: MCP server for Everything file search\n"
+            "everyfile-mcp: MCP server for Everything file search\n"
             "\n"
             "This is a stdio MCP server — it expects JSON-RPC on stdin\n"
             "and is meant to be launched by an MCP client, not run directly.\n"
             "\n"
             "Add to your MCP client config:\n"
             "\n"
-            '  { "mcpServers": { "everything": { "command": "everything-mcp" } } }\n'
+            '  { "mcpServers": { "everything": { "command": "everyfile-mcp" } } }\n'
             "\n"
-            "Or test with:  echo '{...}' | everything-mcp",
+            "Or test with:  echo '{...}' | everyfile-mcp",
             file=sys.stderr,
         )
         sys.exit(0)

@@ -1,12 +1,12 @@
-# everything-mcp — CLI Reference
+# everyfile — CLI Reference
 
 Shell command for instant file search via Voidtools Everything.
-Aliases: `everything`, `every`, `ev`. Use `ev` for brevity.
+Aliases: `everyfile`, `every`, `ev`. Use `ev` for brevity.
 
 ## Install
 
 ```powershell
-pip install everything-mcp
+pip install everyfile
 ```
 
 ## Search Syntax (passed verbatim to Everything)

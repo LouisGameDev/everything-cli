@@ -1,7 +1,7 @@
-# everything-mcp MCP Server — Design Spec
+# everyfile MCP Server — Design Spec
 
 > MCP (Model Context Protocol) server exposing Voidtools Everything file search to AI assistants.
-> Built on top of `everything_mcp`'s Python API.
+> Built on top of `everyfile`'s Python API.
 
 ---
 
@@ -10,7 +10,7 @@
 | # | Goal | Detail |
 |---|------|--------|
 | 1 | **Instant file discovery for AI agents** | Let LLMs search the entire filesystem in milliseconds via Everything |
-| 2 | **Thin wrapper over existing API** | All logic lives in `everything_mcp`; the MCP layer is just transport |
+| 2 | **Thin wrapper over existing API** | All logic lives in `everyfile`; the MCP layer is just transport |
 | 3 | **Minimal new dependencies** | Only add `mcp` (the official Python MCP SDK) as an optional dependency |
 | 4 | **Composable** | Search results return structured data that agents can reason over |
 | 5 | **Safe by default** | Read-only — no file mutations, no writes, no deletes |
@@ -22,7 +22,7 @@
 ### Install target
 
 ```
-pip install everything-mcp[mcp]
+pip install everyfile[mcp]
 ```
 
 ### `pyproject.toml` additions
@@ -33,24 +33,24 @@ mcp = ["mcp[cli]>=1.0"]
 dev = ["pytest", "mypy"]
 
 [project.scripts]
-everything-mcp = "everything_mcp.mcp:main"
+everyfile-mcp = "everyfile.mcp:main"
 ```
 
 ### Module location
 
 ```
-src/everything_mcp/
+src/everyfile/
   mcp.py              # MCP server entry point + tool definitions
 ```
 
-Single file. The MCP layer is a thin adapter over `everything_mcp.api`.
+Single file. The MCP layer is a thin adapter over `everyfile.api`.
 
 ---
 
 ## 3. Transport
 
 - **Default:** stdio (launched by the AI client as a subprocess)
-- **Entry point:** `everything-mcp` CLI command (or `python -m everything_mcp.mcp`)
+- **Entry point:** `everyfile-mcp` CLI command (or `python -m everyfile.mcp`)
 
 ### MCP client configuration (e.g. Claude Desktop, VS Code)
 
@@ -58,7 +58,7 @@ Single file. The MCP layer is a thin adapter over `everything_mcp.api`.
 {
   "mcpServers": {
     "everything": {
-      "command": "everything-mcp"
+      "command": "everyfile-mcp"
     }
   }
 }
@@ -71,7 +71,7 @@ Or if installed in a venv:
   "mcpServers": {
     "everything": {
       "command": "python",
-      "args": ["-m", "everything_mcp.mcp"]
+      "args": ["-m", "everyfile.mcp"]
     }
   }
 }
@@ -254,11 +254,11 @@ Agent → get_everything_info()
 ## 9. Implementation Skeleton
 
 ```python
-"""everything-mcp MCP server."""
+"""everyfile MCP server."""
 
 from mcp.server.fastmcp import FastMCP
 
-from everything_mcp import Everything, EverythingError
+from everyfile import Everything, EverythingError
 
 mcp = FastMCP(
     "everything",

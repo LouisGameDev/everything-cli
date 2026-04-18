@@ -1,4 +1,4 @@
-# everything-mcp – Public Python API
+# everyfile – Public Python API
 
 from .api import Cursor as Cursor
 from .api import Everything as Everything

@@ -1,4 +1,4 @@
-# everything-mcp — Python API Reference
+# everyfile — Python API Reference
 
 Typed Python library for instant file search via Voidtools Everything.
 Zero external dependencies. DB-API 2.0-style `Cursor`/`Row` objects.
@@ -6,22 +6,22 @@ Zero external dependencies. DB-API 2.0-style `Cursor`/`Row` objects.
 ## Install
 
 ```powershell
-pip install everything-mcp
+pip install everyfile
 ```
 
 ## Import Surface
 
 ```python
-from everything_mcp import search, count          # module-level shortcuts
-from everything_mcp import Everything             # reusable client (instance affinity)
-from everything_mcp import Cursor, Row            # types for annotation
-from everything_mcp import EverythingError        # error handling
+from everyfile import search, count          # module-level shortcuts
+from everyfile import Everything             # reusable client (instance affinity)
+from everyfile import Cursor, Row            # types for annotation
+from everyfile import EverythingError        # error handling
 ```
 
 ## Complex Examples
 
 ```python
-from everything_mcp import Everything, search, count
+from everyfile import Everything, search, count
 
 # --- Reusable client ---
 ev = Everything()              # auto-detect instance
@@ -101,7 +101,7 @@ Everything.instances()  # [{"name": "1.5a", "hwnd": ...}, ...]
 ## Error Handling
 
 ```python
-from everything_mcp import search, EverythingError
+from everyfile import search, EverythingError
 
 try:
     results = search("ext:py").fetchall()
@@ -115,7 +115,7 @@ except EverythingError as e:
 ## Real-World Patterns
 
 ```python
-from everything_mcp import Everything
+from everyfile import Everything
 from pathlib import Path
 import json
 
